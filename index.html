@@ -450,13 +450,25 @@ function pickSpecies(){
   for(const s of SPECIES){r-=s.r?1:3;if(r<=0)return s.id}
   return SPECIES[0].id;
 }
-function newPet(gen,week,name,hyb){
-  const p={name:name||'もち',gen,species:hyb?hyb.id:pickSpecies(),aspect:ASPECTS[Math.floor(Math.random()*ASPECTS.length)].id,stage:0,born:week,bornAt:Date.now(),weeks:0,stats:{min:0,bySubj:{},morning:0,night:0},dead:false,died:null};
+function newPet(gen,week,name,egg){
+  const hyb=egg&&!egg.species?egg:null;
+  const p={name:name||'もち',gen,species:egg?(egg.species||egg.id):pickSpecies(),aspect:ASPECTS[Math.floor(Math.random()*ASPECTS.length)].id,stage:0,born:week,bornAt:Date.now(),weeks:0,stats:{min:0,bySubj:{},morning:0,night:0},dead:false,died:null};
   if(hyb)p.hyb=hyb;
   return p;
 }
-/* breeding: the child wears one parent's picture with the other's showing through behind it */
+/* breeding: certain pairs of parents give a rare kind; any other pair gives one parent's kind.
+   Older saves may still hold hybrids, which wear one parent's picture over the other's. */
+const RECIPES=[['tenkou','kakkai','kyubi'],['kishou','bankyo','hippou'],['banban','kiyo','hiyoku'],['heihou','shoushou','soushou'],
+  ['meida','tenba','ouryu'],['chouda','kada','hada'],['hii','kara','souryu'],['shokai','kishou','ki'],['ko','taihou','raijin'],
+  ['haku','shujuu','sugo'],['bouba','tenkou','joukou'],['goutei','jinmenkyou','houkyou'],['kiyo','shokuchou','kyuhou'],
+  ['sou','ningyo','tengo'],['rouchitsu','hii2','shokuryu'],['hakui','seisei','teikou'],['tei','kyouryou','rikugo'],
+  ['rokushoku','tenba','eishou'],['kyoho','shinchi','keiten'],['shahi','keimou','jokushuu'],['shoken','takuhi','shukuyu']];
+function breedKind(a,b){
+  const r=RECIPES.find(x=>(x[0]===a&&x[1]===b)||(x[0]===b&&x[1]===a));
+  return r?r[2]:(Math.random()<.5?a:b);
+}
 const artOf=P=>(P&&P.art&&P.art[0])||(P&&SPECIES.some(s=>s.id===P.id)?P.id:spOf(P&&P.id).id);
+function makeEgg(A,B){return{species:breedKind(artOf(A),artOf(B)),parents:[A.n,B.n]}}
 function makeHybrid(A,B){
   const n1=Array.from(A.n)[0],n2=Array.from(B.n).slice(-1)[0];
   const front=Math.random()<.5;
@@ -488,7 +500,7 @@ function migrate(st){
     const o=st.dex[id];delete st.dex[id];
     seeDex(st,OLDSP[id],o.s||0,null,o.rank||0);(o.asp||[]).forEach(a=>seeDex(st,OLDSP[id],0,a));
   });
-  [p.hyb,st.nextEgg].concat(st.plaza.map(e=>e.hyb)).forEach(h=>{if(h&&!h.art)h.art=artIds(Object.assign({hybrid:1},h))});
+  [p.hyb,st.nextEgg].concat(st.plaza.map(e=>e.hyb)).forEach(h=>{if(h&&!h.species&&!h.art)h.art=artIds(Object.assign({hybrid:1},h))});
   st.plaza.forEach(e=>{if(!e.hyb)seeDex(st,e.species,MAXST,e.aspect,e.rank)});
   if(!p.dead&&(p.stage||0)>0&&!p.hyb)seeDex(st,p.species,p.stage);
   st.v=3;
@@ -693,7 +705,7 @@ function eggPicker(defName,label,act){
   const ne=S.settings.nextEgg;
   return '<div class="row"><label class="f" for="newPetName">新しい子の名前<input id="newPetName" maxlength="12" value="'+esc(defName)+'"></label>'+
     '<button class="primary" data-act="'+act+'" style="align-self:flex-end">'+label+'</button></div>'+
-    '<div class="small muted">'+(ne?'次に来るのは、広場で生まれた交配種「'+esc(ne.n)+'」の卵です。':'どの霊獣が生まれるかは、卵がかえるまでわかりません。')+'</div>';
+    '<div class="small muted">'+(ne?'次に来るのは、広場の'+esc(ne.parents.join('と'))+'から生まれた卵です。':'どの霊獣が生まれるかは、卵がかえるまでわかりません。')+'</div>';
 }
 function renderPet(){
   const st=S.settings,pet=st.pet,g=weekProgress();
@@ -742,10 +754,10 @@ function renderPlaza(){
   /* breeding */
   const kinds=pz.filter((p,i,a)=>a.findIndex(q=>q.species===p.species)===i);
   let breed='<div class="divider"></div><h2>交配</h2>';
-  if(st.nextEgg)breed+='<p class="small" style="margin:0">交配種「'+esc(st.nextEgg.n)+'」（'+esc(st.nextEgg.parents.join('×'))+'）の卵が待っています。今の子が卒業するか、新しい卵を迎えるときに生まれます。</p><div class="row"><button data-act="cancelbreed">卵をとりやめる</button></div>';
-  else if(kinds.length<2)breed+='<p class="small muted" style="margin:0">ちがう種類の霊獣が2体広場にそろうと、交配して両方の特徴をもつ卵をつくれます。</p>';
+  if(st.nextEgg)breed+='<p class="small" style="margin:0">'+esc(st.nextEgg.parents.join('×'))+'の卵が待っています。今の子が卒業するか、新しい卵を迎えるときに生まれます。</p><div class="row"><button data-act="cancelbreed">卵をとりやめる</button></div>';
+  else if(kinds.length<2)breed+='<p class="small muted" style="margin:0">ちがう種類の霊獣が2体広場にそろうと、交配して卵をつくれます。</p>';
   else{const opts=sid=>pz.map(p=>'<option value="'+esc(p.id)+'"'+(p.id===sid?' selected':'')+'>'+esc(p.name)+'（'+esc(beastOf(p).n)+'）</option>').join('');
-    breed+='<p class="small muted" style="margin:0">ちがう種類の2体を選ぶと、両方の特徴をもつ卵が生まれます。親は広場に残ります。</p><div class="row"><label class="f" for="breedA">一体目<select id="breedA">'+opts(kinds[0].id)+'</select></label><label class="f" for="breedB">二体目<select id="breedB">'+opts(kinds[1].id)+'</select></label><button class="primary" data-act="breed" style="align-self:flex-end">交配する</button></div>';}
+    breed+='<p class="small muted" style="margin:0">ちがう種類の2体から卵をつくります。ふつうはどちらかの親と同じ種類ですが、決まった組み合わせのときだけ、めったに出会えない珍しい霊獣が生まれます。親は広場に残ります。</p><div class="row"><label class="f" for="breedA">一体目<select id="breedA">'+opts(kinds[0].id)+'</select></label><label class="f" for="breedB">二体目<select id="breedB">'+opts(kinds[1].id)+'</select></label><button class="primary" data-act="breed" style="align-self:flex-end">交配する</button></div>';}
   el.innerHTML='<section class="card"><div class="card-head"><h2>広場</h2><span class="muted small">'+pz.length+'体が暮らしています</span></div>'+field+info+breed+'</section>';
 }
 function renderZukan(){
@@ -924,7 +936,7 @@ document.addEventListener('click',async ev=>{
     }
     const hyb=st.nextEgg||null;st.nextEgg=null;
     st.pet=newPet((st.pet.gen||1)+1,S.cur,name||'もち',hyb);st.lastWeek=S.cur;render();
-    toast(note+(hyb?'交配種の卵がやってきました。':'新しい卵がやってきました。'));
+    toast(note+(hyb?'交配の卵がやってきました。':'新しい卵がやってきました。'));
     await saveSettings();
   }else if(act==='export'){
     try{
@@ -963,8 +975,8 @@ document.addEventListener('click',async ev=>{
     if(!a||!c)return;
     const A=beastOf(a),C=beastOf(c);
     if(a.id===c.id||A.id===C.id){toast('ちがう種類の霊獣を2体選んでください。');return}
-    st.nextEgg=makeHybrid(A,C);render();
-    toast(A.n+'と'+C.n+'から、交配種「'+st.nextEgg.n+'」の卵ができました。');
+    st.nextEgg=makeEgg(A,C);render();
+    toast(A.n+'と'+C.n+'から卵ができました。何が生まれるかは、かえってのお楽しみ。');
     await saveSettings();
   }else if(act==='cancelbreed'){
     st.nextEgg=null;render();await saveSettings();
