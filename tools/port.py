@@ -1,4 +1,4 @@
-"""Artifact版 benkyo-pet.html → GitHub Pages + Firebase 版 index.html に変換する。
+"""Artifact版 benkyo-pet.html（山海勉強録） → GitHub Pages + Firebase 版 index.html に変換する。
 使い方: python3 port.py ../benkyo-pet.html site/index.html
 Artifact版が更新されたら、もう一度これを実行するだけで移植できる。"""
 import sys
@@ -17,12 +17,12 @@ head = f'''<!doctype html>
 <html lang="ja"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#23845f">
+<meta name="theme-color" content="#b23a28">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="べんきょうペット">
+<meta name="apple-mobile-web-app-title" content="山海勉強録">
 <script src="{FB}firebase-app-compat.js"></script>
 <script src="{FB}firebase-auth-compat.js"></script>
 <script src="{FB}firebase-firestore-compat.js"></script>
@@ -42,7 +42,7 @@ rep('''<footer id="footer">読み込み中…</footer>
 </div>''', '''<footer id="footer">読み込み中…</footer>
   <div id="acct"></div>
 </div>
-<div id="gate" hidden><div class="card"><h2>べんきょうペット</h2>
+<div id="gate" hidden><div class="card"><h2>山海勉強録</h2>
   <p class="small muted" style="margin:0">Googleでログインすると、スマホとPCで同じ記録とペットが使えます。</p>
   <button class="big-btn primary" id="gateLogin">Googleでログイン</button>
   <button class="ghost" id="gateLocal">ログインせずに使う（この端末だけに保存）</button>

@@ -1,4 +1,4 @@
-# べんきょうペット
+# 山海勉強録（べんきょうペット）
 
 勉強時間を記録して、週の目標を達成するとペットが育つアプリ。GitHub Pages + Firebase（Googleログイン・Firestore）。
 
