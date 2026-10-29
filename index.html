@@ -837,6 +837,8 @@ function renderSettings(){
       (S.confirmDel===s.id?'<button class="danger-confirm small" data-act="delsubj" data-id="'+esc(s.id)+'">削除する</button>':'<button class="ghost" data-act="askdel" data-id="'+esc(s.id)+'" aria-label="'+esc(s.name)+'を削除">×</button>')+'</div>').join('')
      :'<div class="empty">教科がありません。下から追加してください。</div>')+
     '</div><form class="row" id="addSubjForm"><input id="newSubj" maxlength="16" placeholder="例：物理、世界史、TOEIC" style="flex:1 1 10em" aria-label="追加する教科名"><button class="primary" type="submit">教科を追加</button></form>'+
+    '<div class="divider"></div><h2>記録をすべて消す</h2><p class="small muted" style="margin:0">勉強の記録・霊獣・お墓・広場・図鑑を消して、最初からやり直します。目標と教科は残ります。元にはもどせません。</p>'+
+    '<div class="row">'+(S.confirmDel==='__reset'?'<button class="danger-confirm" data-act="resetall">本当にすべて消す</button><button class="ghost" data-act="cancelreset">やめる</button>':'<button data-act="askdel" data-id="__reset">記録をすべて消す</button>')+'</div>'+
     '<div class="divider"></div><h2>データの書き出し</h2><p class="small muted" style="margin:0">記録と霊獣をまとめて1つのファイル（JSON）にします。新しいアプリへの引っ越しに使います。</p>'+
     '<div class="row"><button data-act="export">データを書き出す</button>'+(S.exportText?'<button data-act="copyexport">コピー</button>':'')+'</div>'+
     (S.exportText?'<textarea id="exportBox" readonly rows="4" style="width:100%;font:12px/1.4 monospace;border:1px solid var(--line);border-radius:10px;padding:8px;background:var(--surface-2);color:var(--ink)">'+esc(S.exportText)+'</textarea><div class="small muted">'+esc(S.exportNote||'')+'</div>':'')+
@@ -937,6 +939,12 @@ document.addEventListener('click',async ev=>{
     const box=$('exportBox');
     try{await navigator.clipboard.writeText(S.exportText);S.exportNote='コピーしました。';render()}
     catch(e){if(box){box.focus();box.select()}S.exportNote='自動でコピーできなかったので、選択された文字をコピーしてください。';const n=document.querySelector('#exportBox+div');if(n)n.textContent=S.exportNote}
+  }else if(act==='cancelreset'){
+    render();
+  }else if(act==='resetall'){
+    S.confirmDel=null;
+    try{await resetAll();S.exportText='';render();toast('記録をすべて消しました。新しい卵から始まります。')}
+    catch(e){console.error(e);render();toast('消せませんでした。通信状態を確認して、もう一度お試しください。')}
   }else if(act==='import'){
     let data;try{data=JSON.parse(($('importBox').value||'').trim())}catch(e){toast('読み込めませんでした。書き出した文字をそのまま貼りつけてください。');return}
     if(!data||data.app!=='benkyo-pet'||!data.settings||typeof data.weeks!=='object'){toast('べんきょうペットのデータではないようです。');return}
@@ -991,6 +999,21 @@ async function exportAll(){
   }else{Object.keys(store.mem).forEach(n=>{const v=JSON.parse(store.mem[n]);if(n==='settings')out.settings=v;else if(n.startsWith('w-'))out.weeks[n.slice(2)]=v})}
   if(!out.settings)out.settings=S.settings;
   return out;
+}
+
+/* wipe everything except the goal and subjects */
+async function resetAll(){
+  const keep={goalMin:S.settings.goalMin,subjects:S.settings.subjects};
+  await Promise.all(Object.values(store.q));
+  if(store.mode==='cloud'){
+    const snap=await store.db.collection('data/users/'+store.uid).get();
+    for(const d of snap.docs)if(d.id!=='settings')await store.db.doc(path(d.id)).delete();
+  }else if(store.mode==='local'){
+    const ks=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('bp:w-'))ks.push(k)}
+    ks.forEach(k=>localStorage.removeItem(k));
+  }else Object.keys(store.mem).forEach(n=>{if(n.startsWith('w-'))delete store.mem[n]});
+  S.settings=Object.assign(defaults(S.cur),keep);S.weeks={};S.weeks[S.cur]={entries:[]};S.sel=null;S.zsel=null;
+  await saveSettings();
 }
 
 /* ---------- views ---------- */
