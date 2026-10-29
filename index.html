@@ -193,7 +193,7 @@ footer{color:var(--muted);font-size:.8rem;text-align:center;letter-spacing:.04em
 .loading{opacity:.6;pointer-events:none}
 </style>
 
-<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs><filter id="bp-ink" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" seed="7"/><feDisplacementMap in="SourceGraphic" scale="2.6"/></filter><linearGradient id="bp-shade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#231d17" stop-opacity=".38"/><stop offset=".45" stop-color="#231d17" stop-opacity=".08"/><stop offset="1" stop-color="#231d17" stop-opacity="0"/></linearGradient><radialGradient id="bp-aura-moku"><stop offset="0" stop-color="#3f7f5f" stop-opacity=".45"/><stop offset="1" stop-color="#3f7f5f" stop-opacity="0"/></radialGradient><radialGradient id="bp-aura-ka"><stop offset="0" stop-color="#c8452c" stop-opacity=".45"/><stop offset="1" stop-color="#c8452c" stop-opacity="0"/></radialGradient><radialGradient id="bp-aura-do"><stop offset="0" stop-color="#b88a2c" stop-opacity=".45"/><stop offset="1" stop-color="#b88a2c" stop-opacity="0"/></radialGradient><radialGradient id="bp-aura-kin"><stop offset="0" stop-color="#a8946a" stop-opacity=".45"/><stop offset="1" stop-color="#a8946a" stop-opacity="0"/></radialGradient><radialGradient id="bp-aura-sui"><stop offset="0" stop-color="#2f4f6f" stop-opacity=".45"/><stop offset="1" stop-color="#2f4f6f" stop-opacity="0"/></radialGradient></defs></svg>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs><filter id="bp-ink" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" seed="7"/><feDisplacementMap in="SourceGraphic" scale="2.6"/></filter><filter id="bp-fog1" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="1.9"/></filter><filter id="bp-fog2" x="-15%" y="-15%" width="130%" height="130%"><feGaussianBlur stdDeviation="3.6"/><feColorMatrix type="saturate" values=".55"/></filter><radialGradient id="bp-mist" cx=".5" cy=".55" r=".6"><stop offset="0" stop-color="#f6efe0" stop-opacity=".9"/><stop offset="1" stop-color="#f1e8d4" stop-opacity=".5"/></radialGradient><linearGradient id="bp-shade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#231d17" stop-opacity=".38"/><stop offset=".45" stop-color="#231d17" stop-opacity=".08"/><stop offset="1" stop-color="#231d17" stop-opacity="0"/></linearGradient><radialGradient id="bp-aura-moku"><stop offset="0" stop-color="#3f7f5f" stop-opacity=".45"/><stop offset="1" stop-color="#3f7f5f" stop-opacity="0"/></radialGradient><radialGradient id="bp-aura-ka"><stop offset="0" stop-color="#c8452c" stop-opacity=".45"/><stop offset="1" stop-color="#c8452c" stop-opacity="0"/></radialGradient><radialGradient id="bp-aura-do"><stop offset="0" stop-color="#b88a2c" stop-opacity=".45"/><stop offset="1" stop-color="#b88a2c" stop-opacity="0"/></radialGradient><radialGradient id="bp-aura-kin"><stop offset="0" stop-color="#a8946a" stop-opacity=".45"/><stop offset="1" stop-color="#a8946a" stop-opacity="0"/></radialGradient><radialGradient id="bp-aura-sui"><stop offset="0" stop-color="#2f4f6f" stop-opacity=".45"/><stop offset="1" stop-color="#2f4f6f" stop-opacity="0"/></radialGradient></defs></svg>
 <div class="wrap" id="app">
   <header class="top">
     <div class="brand"><div class="seal" aria-hidden="true"><span>山</span><span>海</span><span>勉</span><span>録</span></div><div><h1>山海勉強録</h1><div class="sub">霊獣を育てる勉強帳</div></div></div>
@@ -307,114 +307,127 @@ function sset(name,obj){
 
 /* ---------- state ---------- */
 const S={settings:null,weeks:{},ready:false,cur:weekKey(new Date()),confirmDel:null,msg:'',view:'home',sel:null};
-/* ---------- the bestiary: beasts of the Shan Hai Jing ----------
-   t: body type, c: body color, hc: head color, tc: tail color, h: horns, e: eyes, w: wing pairs,
-   tl: tails, tt: tail style, hd: heads, hf: human face, lg: legs, m: marks, mn: mane color, x: special, r: rarity (1 = rare) */
+/* ---------- the bestiary: beasts of the Shan Hai Jing, one painting each (pg: page in the album) ----------
+   r: rarity (1 = rare) */
 const SPECIES=[
-{id:'fei',n:'蜚',k:'ひ',t:'ox',c:'#6f5841',hc:'#ece3d0',e:1,tt:'snake',h:'ox',lore:'太山にすむ。牛のような体に白い頭、一つ目で蛇の尾。現れると川がかれ、疫病がはやる。'},
-{id:'shokai',n:'諸懐',k:'しょかい',t:'ox',c:'#8c7556',h:'four',hf:'eyes',mn:'#9c4128',tt:'tuft',lore:'北嶽の山にすむ。牛に似て四本の角、人の目、豚の耳。雁のような声で鳴き、人を食う。'},
-{id:'saikyo',n:'犀渠',k:'さいきょ',t:'ox',c:'#3f5566',h:'ox',lore:'釐山にすむ。牛のようで青黒く、赤子のような声で鳴き、人を食う。'},
-{id:'ki',n:'夔',k:'き',t:'ox',c:'#7d786c',lg:1,r:1,x:'thunder',lore:'東海の流波山にすむ。牛のようで角がなく一本足。出入りすれば風雨をよび、その光は日月のよう、声は雷のよう。'},
-{id:'reiko',n:'領胡',k:'れいこ',t:'ox',c:'#8a6a4a',tc:'#b23a28',x:'hump',lore:'陽山にすむ。牛のようで赤い尾、首に瘤がある。'},
-{id:'reirei',n:'軨軨',k:'れいれい',t:'ox',c:'#c4914e',m:'stripe',h:'ox',lore:'空桑の山にすむ。牛のようで虎の模様。現れると大水が出る。'},
-{id:'seiseigyu',n:'精精',k:'せいせい',t:'ox',c:'#9a7a58',tt:'horse',h:'ox',lore:'牛のようで馬の尾。自分の名を呼ぶように鳴く。'},
-{id:'gouyu',n:'合窳',k:'ごうゆ',t:'ox',c:'#d6b25a',hf:1,tc:'#b23a28',x:'boar',lore:'剡山にすむ。豚のようで人の顔、黄色い体に赤い尾。人を食い、虫や蛇も食う。'},
-{id:'toukou',n:'当康',k:'とうこう',t:'ox',c:'#7a6a5a',x:'boar tusk',lore:'欽山にすむ。豚のようで牙がある。現れると天下が豊作になる。'},
-{id:'toutou',n:'狪狪',k:'とうとう',t:'ox',c:'#9a8a76',x:'boar pearl',lore:'泰山にすむ。豚のようで、体の中に珠をもつ。'},
-{id:'heihou',n:'并封',k:'へいほう',t:'ox',c:'#3a332b',x:'boar twoends',lore:'巫咸の東にすむ。豚のようで前と後ろに頭があり、体は黒い。'},
-{id:'ji',n:'兕',k:'じ',t:'ox',c:'#4a5560',h:'one',lore:'湘水の南にすむ。犀に似て青黒く、一本の角をもつ。'},
-{id:'bougyu',n:'旄牛',k:'ぼうぎゅう',t:'ox',c:'#3a332b',mn:'#3a332b',x:'legfur',h:'ox',lore:'潘侯の山にすむ。牛のようで、四つの節に長い毛が生えている。'},
-{id:'gouin',n:'獓𤟤',k:'ごういん',t:'ox',c:'#e2dac8',h:'four',mn:'#a49a86',lore:'三危の山にすむ。白い牛のようで四本の角。毛は蓑をかぶったようで、人を食う。'},
-{id:'kyuki',n:'窮奇',k:'きゅうき',t:'cat',c:'#c4914e',w:1,m:'stripe',r:1,lore:'邽山にすむ。虎のようで翼があり、人を頭から食べる。'},
-{id:'sou',n:'狰',k:'そう',t:'cat',c:'#b9573a',h:'one',tl:5,m:'spot',lore:'章莪の山にすむ。赤い豹のようで五本の尾と一本の角。石を打つような声で鳴く。'},
-{id:'ryoukyo',n:'梁渠',k:'りょうきょ',t:'cat',c:'#8a8478',hc:'#ece3d0',lore:'歴石の山にすむ。山猫のようで白い頭、虎の爪。現れると大きな戦が起こる。'},
-{id:'mougyoku',n:'孟極',k:'もうきょく',t:'cat',c:'#e2dac8',m:'spot',lore:'石者の山にすむ。豹のようで額に模様があり、体は白い。よく伏せて身を隠す。'},
-{id:'kaimei',n:'開明獣',k:'かいめいじゅう',t:'cat',c:'#c4914e',hd:9,hf:1,m:'stripe',r:1,lore:'崑崙の門を守る。虎のような大きな体に、人の顔の頭が九つ。'},
-{id:'rikugo',n:'陸吾',k:'りくご',t:'cat',c:'#b88a4a',tl:9,hf:1,m:'stripe',r:1,lore:'崑崙の丘を治める神。虎の体に九本の尾、人の顔に虎の爪。'},
-{id:'rara',n:'羅羅',k:'らら',t:'cat',c:'#4f6f88',m:'stripe',lore:'北海の内にすむ青い虎。'},
-{id:'sugo',n:'騶吾',k:'すうご',t:'cat',c:'#c4914e',m:'stripe',tt:'long',x:'fivecolor',lore:'林氏の国にすむ。虎ほどの大きさで五色の模様、尾は体より長い。一日に千里を走る。'},
-{id:'tei',n:'彘',k:'てい',t:'cat',c:'#c4914e',m:'stripe',tt:'tuft',lore:'浮玉の山にすむ。虎のようで牛の尾、犬のような声で鳴き、人を食う。'},
-{id:'bafuku',n:'馬腹',k:'ばふく',t:'cat',c:'#a8844a',hf:1,m:'stripe',lore:'蔓渠の山の伊水にすむ。人の顔に虎の体。赤子のような声で鳴き、人を食う。'},
-{id:'kyubi',n:'九尾狐',k:'きゅうびこ',t:'fox',c:'#e2c991',tl:9,tt:'fox',r:1,lore:'青丘の山にすむ。九本の尾をもつ狐。赤子のような声で鳴く。食べると邪気にあたらない。'},
-{id:'tenkou',n:'天狗',k:'てんこう',t:'fox',c:'#8a6a4a',hc:'#ece3d0',lore:'陰山にすむ。山猫のようで白い頭。凶事をふせぐ。'},
-{id:'kou',n:'狡',k:'こう',t:'fox',c:'#c4914e',m:'spot',h:'ox',lore:'玉山にすむ。犬のようで豹の模様、牛の角。現れると国が豊かになる。'},
-{id:'shoushou',n:'從從',k:'しょうしょう',t:'fox',c:'#9a8a76',lg:6,tt:'tuft',lore:'栒状の山にすむ。犬のようで六本足。自分の名を呼ぶように鳴く。'},
-{id:'heihei',n:'獙獙',k:'へいへい',t:'fox',c:'#d6b88a',w:1,tt:'fox',lore:'姑逢の山にすむ。狐のようで翼があり、雁のような声。現れると大日照りになる。'},
-{id:'joukou',n:'乗黄',k:'じょうこう',t:'fox',c:'#d6a23c',tt:'fox',x:'backhorns',r:1,lore:'白民の国にいる。狐のようで背中に角がある。乗れば二千年生きるという。'},
-{id:'shujuu',n:'朱獳',k:'しゅじゅ',t:'fox',c:'#c0603a',tt:'fox',x:'fins',lore:'耿山にすむ。狐のようで魚の鰭がある。現れると国に恐れがおこる。'},
-{id:'sanki',n:'山𤟤',k:'さんき',t:'fox',c:'#8a7458',hf:1,lore:'獄法の山にすむ。犬のようで人の顔。人を見ると笑い、現れると大風が吹く。'},
-{id:'katsuso',n:'猲狙',k:'かっそ',t:'fox',c:'#6f5841',hc:'#b9573a',lore:'北号の山にすむ。狼のようで赤い頭、鼠の目。豚のような声で鳴き、人を食う。'},
-{id:'tenba',n:'天馬',k:'てんば',t:'fox',c:'#e2dac8',hc:'#3a332b',w:1,lore:'馬成の山にすむ。白い犬のようで黒い頭。人を見ると飛んでいく。'},
-{id:'sojo',n:'狙如',k:'そじょ',t:'fox',c:'#8a8478',x:'whiteears',lore:'倚帝の山にすむ。鼠のようで白い耳、白い口。現れると大きな戦が起こる。'},
-{id:'keihen',n:'谿辺',k:'けいへん',t:'fox',c:'#7a6a5a',lore:'天帝の山にすむ。犬のようで、その皮を敷くと毒気にあたらない。'},
-{id:'rin',n:'獜',k:'りん',t:'fox',c:'#6c8467',m:'scale',lore:'依軲の山にすむ。犬のようで虎の爪、体に鱗がある。よく跳ねる。'},
-{id:'hihi',n:'朏朏',k:'ひひ',t:'fox',c:'#d6c8a8',tt:'fox',mn:'#f3ecdc',lore:'霍山にすむ。山猫のようで白い尾とたてがみ。飼うと憂いがなくなる。'},
-{id:'kan',n:'讙',k:'かん',t:'fox',c:'#a8844a',e:1,tl:3,lore:'翼望の山にすむ。山猫のようで一つ目に三本の尾。百の声をまねる。'},
-{id:'eishou',n:'英招',k:'えいしょう',t:'horse',c:'#c4914e',hf:1,m:'stripe',w:1,r:1,lore:'槐江の山を治める神。馬の体に人の顔、虎の模様と鳥の翼。'},
-{id:'haku',n:'駮',k:'はく',t:'horse',c:'#e2dac8',tc:'#231d17',h:'one',x:'fangs',lore:'中曲の山にすむ。白い馬のようで黒い尾、一本の角と虎の牙。虎や豹を食う。'},
-{id:'rokushoku',n:'鹿蜀',k:'ろくしょく',t:'horse',c:'#c4914e',hc:'#ece3d0',tc:'#b23a28',m:'stripe',lore:'杻陽の山にすむ。馬のようで白い頭、虎の模様に赤い尾。歌うような声。'},
-{id:'jukuko',n:'孰湖',k:'じゅくこ',t:'horse',c:'#8a7458',hf:1,w:1,tt:'snake',lore:'崦嵫の山にすむ。馬の体に鳥の翼、人の顔、蛇の尾。人を抱き上げるのを好む。'},
-{id:'fusho',n:'夫諸',k:'ふしょ',t:'horse',c:'#e2dac8',h:'antler4',x:'deer',lore:'敖岸の山にすむ。白い鹿のようで四本の角。現れると大水が出る。'},
-{id:'hakui',n:'猼訑',k:'はくい',t:'horse',c:'#d6c8a8',h:'ram',tl:9,x:'sheep backeyes',lore:'基山にすむ。羊のようで九本の尾と四つの耳、目は背中にある。'},
-{id:'kanyou',n:'羬羊',k:'かんよう',t:'horse',c:'#e2dac8',h:'ram',tt:'horse',x:'sheep',lore:'銭来の山にすむ。羊のようで馬の尾。その脂で肌のひびを治す。'},
-{id:'bouba',n:'旄馬',k:'ぼうば',t:'horse',c:'#6f5841',x:'legfur',mn:'#3a332b',lore:'巴蛇の西北にすむ。馬のようで、四つの節に長い毛がある。'},
-{id:'kitsuryou',n:'吉量',k:'きつりょう',t:'horse',c:'#e2dac8',mn:'#b23a28',x:'goldeyes',r:1,lore:'犬封の国にいる。白い体に赤いたてがみ、目は黄金のよう。乗れば千年生きる。'},
-{id:'seisei',n:'狌狌',k:'せいせい',t:'ape',c:'#8a7458',x:'whiteears',lore:'招揺の山にすむ。猿のようで白い耳。伏して走り、人のように歩く。'},
-{id:'shuen',n:'朱厭',k:'しゅえん',t:'ape',c:'#7a6a5a',hc:'#ece3d0',x:'redfeet',lore:'小次の山にすむ。猿のようで白い頭、赤い足。現れると大きな戦が起こる。'},
-{id:'kyoho',n:'挙父',k:'きょほ',t:'ape',c:'#8a7458',m:'stripe',tt:'long',lore:'崇吾の山にすむ。猿のようで腕に模様があり、豹の尾。よく物を投げる。'},
-{id:'gou',n:'囂',k:'ごう',t:'ape',c:'#6f5841',x:'longarms',lore:'羭次の山にすむ。猿のようで腕が長く、よく物を投げる。'},
-{id:'kakkai',n:'猾褢',k:'かつかい',t:'ape',c:'#8a7a66',mn:'#3a332b',lore:'尭光の山にすむ。人のようで豚のたてがみ。穴にこもって冬を過ごす。'},
-{id:'keiten',n:'刑天',k:'けいてん',t:'ape',c:'#8a7458',x:'headless',r:1,lore:'帝と争って首を切られ、乳を目に、へそを口にして、盾と斧をふるい舞いつづける。'},
-{id:'chouyuu',n:'長右',k:'ちょうゆう',t:'ape',c:'#7a6a5a',x:'fourears',lore:'長右の山にすむ。猿のようで四つの耳。現れると大水が出る。'},
-{id:'youwa',n:'雍和',k:'ようわ',t:'ape',c:'#d6b25a',x:'redeyes',lore:'豊山にすむ。猿のようで赤い目、赤い口、黄色い体。現れると国に恐れがおこる。'},
-{id:'kyouyou',n:'梟陽',k:'きょうよう',t:'ape',c:'#3a332b',hf:1,lore:'南方にすむ。人の顔で唇が長く、体は黒く毛深い。人を見ると笑う。'},
-{id:'hippou',n:'畢方',k:'ひっぽう',t:'crane',c:'#8a9f9f',lg:1,x:'fire',lore:'章莪の山にすむ。鶴のようで一本足、青い体に赤い模様、白いくちばし。現れると怪火が起こる。'},
-{id:'kochou',n:'蠱雕',k:'こちょう',t:'fowl',c:'#6f5841',h:'one',x:'hook',lore:'鹿呉の山の沢にすむ。鷲のようで角があり、赤子のような声で鳴き、人を食う。'},
-{id:'seiei',n:'精衛',k:'せいえい',t:'fowl',c:'#3a332b',x:'redfeet',lore:'発鳩の山にすむ。烏のようで模様のある頭、白いくちばし、赤い足。海を埋めようと木や石を運びつづける。'},
-{id:'ranchou',n:'鸞鳥',k:'らんちょう',t:'fowl',c:'#5f8a86',tl:3,x:'crest fivecolor',lore:'女床の山にすむ。雉のようで五色の羽。現れると天下が安らぐ。'},
-{id:'houou',n:'鳳皇',k:'ほうおう',t:'fowl',c:'#c0603a',tl:5,x:'crest fivecolor',r:1,lore:'丹穴の山にすむ。鶏のようで五色の模様。自ら歌い舞い、現れると天下が安らぐ。'},
-{id:'hiyoku',n:'比翼鳥',k:'ひよくのとり',t:'fowl',c:'#4f6f88',x:'pair',lore:'結匈の東にいる。青と赤の鳥で、一つの翼と一つの目しかなく、二羽そろって飛ぶ。'},
-{id:'shu',n:'鴸',k:'しゅ',t:'fowl',c:'#7a6a5a',x:'owl hands',lore:'柜山にすむ。鴟のようで人の手をもつ。現れると流罪が多くなる。'},
-{id:'kiyo',n:'鵸鵌',k:'きよ',t:'fowl',c:'#3a332b',hd:3,tl:6,lore:'翼望の山にすむ。烏のようで三つの頭と六本の尾。よく笑う。'},
-{id:'sanseichou',n:'三青鳥',k:'さんせいちょう',t:'fowl',c:'#4f6f88',hc:'#b23a28',x:'flock',lore:'西王母のために食べ物を運ぶ三羽の青い鳥。赤い頭に黒い目。'},
-{id:'sanyo',n:'酸与',k:'さんよ',t:'crane',c:'#6c8467',w:2,e:6,lg:3,lore:'景山にすむ。蛇のような鳥で四枚の翼、六つの目、三本の足。現れると国に恐れがおこる。'},
-{id:'gyou',n:'顒',k:'ぎょう',t:'fowl',c:'#8a7458',hf:1,e:4,x:'owl',lore:'令丘の山にすむ。梟のようで人の顔、四つの目。現れると大日照りになる。'},
-{id:'kujo',n:'瞿如',k:'くじょ',t:'fowl',c:'#7d786c',hc:'#ece3d0',hf:1,lg:3,lore:'禱過の山にすむ。鵁のようで白い頭、三本の足に人の顔。'},
-{id:'fukei',n:'鳧徯',k:'ふけい',t:'fowl',c:'#9a6a48',hf:1,x:'crest',lore:'鹿台の山にすむ。雄鶏のようで人の顔。現れると戦が起こる。'},
-{id:'sushi',n:'數斯',k:'すうし',t:'fowl',c:'#7a6a5a',x:'owl humanfeet',lore:'皋塗の山にすむ。鴟のようで人の足をもつ。'},
-{id:'shouda',n:'象蛇',k:'しょうだ',t:'fowl',c:'#c98a7a',tl:3,x:'fivecolor',lore:'陽山にすむ。雌の雉のようで五色の模様。自分の名を呼ぶように鳴く。'},
-{id:'chin',n:'鴆',k:'ちん',t:'crane',c:'#6b5a7a',lg:2,lore:'女几の山にすむ毒の鳥。その羽をひたした酒は人を殺す。'},
-{id:'rui',n:'鸓',k:'るい',t:'fowl',c:'#7a3a2a',hd:2,lg:4,lore:'翠山にすむ。鵲のようで赤黒く、二つの頭と四本の足。火をふせぐ。'},
-{id:'kinhi',n:'欽䲹',k:'きんぴ',t:'crane',c:'#5a5048',hc:'#ece3d0',lg:2,x:'hook tigerclaw',lore:'鍾山の神の子が化した鳥。大きな鶚のようで黒い模様、白い頭に赤いくちばし、虎の爪。'},
-{id:'shunchou',n:'鵕鳥',k:'しゅんちょう',t:'crane',c:'#9a7a48',hc:'#ece3d0',lg:2,x:'redfeet',lore:'鍾山の神の子・鼓が化した鳥。鴟のようで赤い足、まっすぐなくちばし、白い頭。'},
-{id:'takuhi',n:'橐𩇯',k:'たくひ',t:'fowl',c:'#7d786c',hf:1,lg:1,x:'owl',lore:'羭次の山にすむ。梟のようで人の顔、一本足。冬に出て夏に眠る。'},
-{id:'ouryu',n:'応龍',k:'おうりゅう',t:'dragon',c:'#6c8467',w:1,h:'antler',r:1,lore:'翼をもつ龍。黄帝のために蚩尤と戦い、南の地に雨を多くした。'},
-{id:'shokuryu',n:'燭龍',k:'しょくりゅう',t:'serpent',c:'#b9573a',hf:1,r:1,x:'glow',lore:'章尾の山の神。人の顔に赤い蛇の体。目を開けば昼、閉じれば夜になる。'},
-{id:'souryu',n:'相柳',k:'そうりゅう',t:'serpent',c:'#5f7a5a',hd:9,hf:1,r:1,lore:'共工の臣。蛇の体に人の顔の頭が九つ。吐いたところは沼になる。'},
-{id:'meida',n:'鳴蛇',k:'めいだ',t:'serpent',c:'#6c8467',w:2,lore:'鮮山にすむ。蛇のようで四枚の翼。磬を打つような声。現れると大日照りになる。'},
-{id:'hii',n:'肥遺',k:'ひい',t:'serpent',c:'#8a7a48',x:'twobody',lore:'渾夕の山にすむ。一つの頭に二つの体をもつ蛇。現れると大日照りになる。'},
-{id:'kada',n:'化蛇',k:'かだ',t:'serpent',c:'#8a7458',hf:1,w:1,lore:'陽山にすむ。人の顔に豺の体、鳥の翼をもち、蛇のように這う。現れると大水が出る。'},
-{id:'hada',n:'巴蛇',k:'はだ',t:'serpent',c:'#3f4a3a',x:'big',lore:'象を食べ、三年かけて骨を吐き出す大蛇。'},
-{id:'atsuyu',n:'窫窳',k:'あつゆ',t:'dragon',c:'#8a6a4a',h:'nub',lore:'弱水の中にすむ。龍の頭をもち、人を食う。もとは天の神だった。'},
-{id:'chouda',n:'長蛇',k:'ちょうだ',t:'serpent',c:'#6f5841',mn:'#3a332b',lore:'大咸の山にすむ。豚のような毛の生えた大蛇。拍子木を打つような声。'},
-{id:'enni',n:'延維',k:'えんい',t:'serpent',c:'#6b5a7a',hd:2,hf:1,lore:'人の頭に蛇の体。紫の衣に冠をかぶり、見た者は天下の覇者になる。'},
-{id:'kou2',n:'蛟',k:'こう',t:'dragon',c:'#5f8a86',lore:'貺水にすむ。蛇のようで四本の足、小さな頭に細い首。'},
-{id:'bunyou',n:'文鰩魚',k:'ぶんようぎょ',t:'fish',c:'#5f8a86',hc:'#ece3d0',w:1,lore:'泰器の山の川にすむ。鯉のようで鳥の翼、青い模様に白い頭、赤いくちばし。夜に海を飛ぶ。'},
-{id:'sekiju',n:'赤鱬',k:'せきじゅ',t:'fish',c:'#b9573a',hf:1,lore:'青丘の山の英水にすむ。魚の体に人の顔、鴛鴦のような声。'},
-{id:'riku',n:'鯥',k:'りく',t:'fish',c:'#8a7458',tt:'snake',w:1,lore:'柢山にすむ。牛のような魚で蛇の尾、脇の下に翼。冬に死に夏に生き返る。'},
-{id:'kara',n:'何羅魚',k:'からぎょ',t:'fish',c:'#7d786c',tl:10,x:'manybody',lore:'譙明の山の川にすむ。一つの頭に十の体をもつ魚。犬のような声。'},
-{id:'shigyo',n:'鮨魚',k:'しぎょ',t:'fish',c:'#8a8478',x:'doghead',lore:'魚の体に犬の頭。赤子のような声で鳴く。'},
-{id:'zeni',n:'冉遺魚',k:'ぜんいぎょ',t:'fish',c:'#6c7a6a',lg:6,x:'snakehead',lore:'英鞮の山の川にすむ。魚の体に蛇の頭、六本の足。食べると悪夢を見ない。'},
-{id:'yuugyo',n:'鯈魚',k:'ゆうぎょ',t:'fish',c:'#b9573a',hd:4,tl:3,lg:6,lore:'帯山の川にすむ。鶏のようで赤い毛、三本の尾、六本の足、四つの頭。'},
-{id:'ryougyo',n:'陵魚',k:'りょうぎょ',t:'fish',c:'#7d8a96',hf:1,x:'hands',lore:'海の中にすむ。人の顔と人の手、魚の体。'},
-{id:'shuushuu',n:'鰼鰼魚',k:'しゅうしゅうぎょ',t:'fish',c:'#3a4a5a',w:2,lore:'涿光の山の川にすむ。鵲のような魚で十枚の翼。火をふせぐ。'},
-{id:'kokou',n:'虎蛟',k:'こうこう',t:'fish',c:'#c4914e',m:'stripe',tt:'snake',lore:'禱過の山の川にすむ。魚の体に蛇の尾、鴛鴦のような声。'},
-{id:'ningyo',n:'人魚',k:'にんぎょ',t:'fish',c:'#7d786c',lg:4,lore:'決決の水にすむ。四本足の魚で、赤子のような声で鳴く。'},
-{id:'senki',n:'旋亀',k:'せんき',t:'turtle',c:'#5a5a48',tt:'snake',x:'beak',lore:'杻陽の山の怪水にすむ。亀のようで鳥の頭、蝮の尾。木を割るような声。'},
-{id:'sansoku',n:'三足亀',k:'さんそくき',t:'turtle',c:'#6c7a5a',lg:3,lore:'大苦の山の狂水にすむ三本足の亀。食べると大病にかからない。'},
-{id:'shubetsu',n:'珠鼈魚',k:'しゅべつぎょ',t:'turtle',c:'#b98a7a',e:4,lg:6,x:'pearl',lore:'葛山の川にすむ。肺のような形で四つの目、六本の足、珠をもつ。'},
-{id:'teikou',n:'帝江',k:'ていこう',t:'sack',c:'#d6a23c',w:2,lg:6,r:1,lore:'天山にすむ。黄色い袋のような体は火のように赤く、六本足に四枚の翼、顔がない。歌と舞を知る。'},
-{id:'shiniku',n:'視肉',k:'しにく',t:'sack',c:'#c98a7a',e:2,lg:0,lore:'牛の肝のような肉のかたまりで目が二つ。食べても尽きず、また生えてくる。'}
+{id:'shukuyu',n:'祝融',k:'しゅくゆう',pg:3,r:1,lore:'南方を治める火の神。獣の体に人の顔をもち、二頭の龍に乗る。'},
+{id:'ko',n:'鼓',k:'こ',pg:5,lore:'鍾山の神の子。人の顔に龍の体。罪を犯して罰せられ、鳥に姿を変えた。'},
+{id:'eishou',n:'英招',k:'えいしょう',pg:6,r:1,lore:'槐江の山を治める神。馬の体に人の顔、虎の模様と鳥の翼をもち、四海をめぐる。'},
+{id:'rikugo',n:'陸吾',k:'りくご',pg:7,r:1,lore:'崑崙の丘を治める神。虎の体に九本の尾、人の顔に虎の爪をもつ。'},
+{id:'teikou',n:'帝江',k:'ていこう',pg:8,r:1,lore:'天山にすむ。黄色い袋のような体は火のように赤く、六本の足と四枚の翼をもつ。顔はないが、歌と舞を知っている。'},
+{id:'shinchi',n:'神䰠',k:'しんち',pg:9,lore:'剛山にすむ神。人の顔に獣の体、手と足が一本ずつ。'},
+{id:'taihou',n:'泰逢',k:'たいほう',pg:10,lore:'和山の神。人のようで虎の尾をもつ。出入りするときに光をはなち、天地の気を動かす。'},
+{id:'chuui',n:'蟲圍',k:'ちゅうい',pg:12,lore:'驕山の神。人の顔に羊の角、虎の爪。睢水と漳水の淵をめぐって遊ぶ。'},
+{id:'keimou',n:'計蒙',k:'けいもう',pg:13,lore:'光山の神。人の体に龍の頭。漳水の淵に出入りするとき、かならず風と雨をともなう。'},
+{id:'keiten',n:'刑天',k:'けいてん',pg:14,r:1,lore:'帝と争って首を切られたが、乳を目に、へそを口にして、盾と斧を手に舞い続ける。'},
+{id:'jokushuu',n:'蓐収',k:'じょくしゅう',pg:15,r:1,lore:'西方を治める金の神。左の耳に蛇をかけ、二頭の龍に乗る。'},
+{id:'shokuryu',n:'燭陰',k:'しょくいん',pg:16,r:1,lore:'鍾山の神。人の顔に赤い蛇の体で、長さは千里。目を開けば昼、閉じれば夜になる。'},
+{id:'souryu',n:'相柳',k:'そうりゅう',pg:17,r:1,lore:'共工の臣。蛇の体に人の顔の頭が九つ。吐いたところは沼になる。'},
+{id:'shahi',n:'奢比',k:'しゃひ',pg:18,lore:'東方の神。獣の体に人の顔、大きな耳に青い蛇をかける。'},
+{id:'tengo',n:'天呉',k:'てんご',pg:19,r:1,lore:'朝陽の谷の水の神。虎の体に八つの人の顔、八本の足と八本の尾をもつ。'},
+{id:'raijin',n:'雷神',k:'らいじん',pg:22,r:1,lore:'雷沢にすむ。龍の体に人の頭。自分の腹をたたくと雷が鳴る。'},
+{id:'kyuhou',n:'九鳳',k:'きゅうほう',pg:23,r:1,lore:'北の果ての天櫃の山にすむ。九つの人の顔に鳥の体。'},
+{id:'kyouryou',n:'彊良',k:'きょうりょう',pg:24,lore:'北の果ての山にすむ。虎の頭に人の体、四つの蹄。口に蛇をくわえ、手にも蛇をもつ。'},
+{id:'kyouyou',n:'梟陽',k:'きょうよう',pg:40,lore:'南方にすむ。人の顔で唇が長く、体は黒く毛深い。人を見ると笑う。'},
+{id:'teijin',n:'氐人',k:'ていじん',pg:41,lore:'建木の西にいる。人の顔に魚の体で、足はない。'},
+{id:'seisei',n:'狌狌',k:'せいせい',pg:47,lore:'招揺の山にすむ。猿のようで白い耳。伏して走り、人のように歩く。食べると足が速くなる。'},
+{id:'rokushoku',n:'鹿蜀',k:'ろくしょく',pg:48,lore:'杻陽の山にすむ。馬のようで白い頭、虎の模様に赤い尾。歌うような声で鳴き、身につけると子孫が栄える。'},
+{id:'rui2',n:'類',k:'るい',pg:49,lore:'亶爰の山にすむ。山猫のようでたてがみがある。ひとりで雄と雌をかねる。'},
+{id:'hakui',n:'猼訑',k:'はくい',pg:50,lore:'基山にすむ。羊のようで九本の尾と四つの耳、目は背中にある。その皮を身につけると恐れを知らない。'},
+{id:'kyubi',n:'九尾狐',k:'きゅうびこ',pg:51,r:1,lore:'青丘の山にすむ。九本の尾をもつ狐。赤子のような声で鳴く。'},
+{id:'chouyuu',n:'長右',k:'ちょうゆう',pg:52,lore:'長右の山にすむ。猿のようで四つの耳。現れると大水が出る。'},
+{id:'kakkai',n:'猾褢',k:'かつかい',pg:53,lore:'尭光の山にすむ。人のようで豚のたてがみ。穴にこもって冬眠し、現れると世が乱れる。'},
+{id:'tei',n:'彘',k:'てい',pg:54,lore:'浮玉の山にすむ。虎のようで牛の尾、犬のような声で鳴き、人を食う。'},
+{id:'kan2',n:'䍺',k:'かん',pg:55,lore:'洵山にすむ。羊のようで口がない。何も食べなくても死なない。'},
+{id:'kochou',n:'蠱雕',k:'こちょう',pg:56,lore:'鹿呉の山にすむ。雕のようで角があり、赤子のような声で鳴き、人を食う。'},
+{id:'kanyou',n:'羬羊',k:'かんよう',pg:57,lore:'銭来の山にすむ。羊のようで馬の尾。その脂はひび割れをなおす。'},
+{id:'souryou',n:'葱聾',k:'そうろう',pg:58,lore:'符禺の山にすむ。羊のようで赤いたてがみ。'},
+{id:'goutei',n:'豪彘',k:'ごうてい',pg:59,lore:'竹山にすむ。豚のようで、白い毛は簪のように太く、先が黒い。'},
+{id:'kakujo',n:'玃如',k:'かくじょ',pg:60,lore:'皋塗の山にすむ。鹿のようで白い尾、馬の足に人の手、四本の角。'},
+{id:'reiyou',n:'麢羊',k:'れいよう',pg:61,lore:'翠山に多い。羊より大きく細い角をもち、夜は角を木にかけて眠る。'},
+{id:'kyoho',n:'挙父',k:'きょほ',pg:62,lore:'崇吾の山にすむ。猿のようで腕に模様があり、よく物を投げる。'},
+{id:'doro',n:'土螻',k:'どろう',pg:63,lore:'崑崙の丘にすむ。羊のようで四本の角があり、人を食う。'},
+{id:'sou',n:'狰',k:'そう',pg:64,lore:'章莪の山にすむ。赤い豹のようで五本の尾と一本の角。石を打つような声で鳴く。'},
+{id:'tenkou',n:'天狗',k:'てんこう',pg:65,lore:'陰山にすむ。山猫のようで白い頭。凶事をふせぐ。'},
+{id:'gouin',n:'獓𤟤',k:'ごういん',pg:66,lore:'三危の山にすむ。白い牛のようで四本の角。毛は蓑をまとったようで、人を食う。'},
+{id:'kan',n:'讙',k:'かん',pg:67,lore:'翼望の山にすむ。山猫のようで一つ目に三本の尾。百の声をまねる。'},
+{id:'banban',n:'蛮蛮',k:'ばんばん',pg:68,lore:'剛山の川にすむ。鼠の体に鼈の頭、犬のような声で鳴く。'},
+{id:'haku',n:'駮',k:'はく',pg:69,lore:'中曲の山にすむ。白い馬のようで黒い尾、一本の角、虎の牙と爪。太鼓のような声で鳴き、虎や豹を食う。'},
+{id:'kanso',n:'䑏疏',k:'かんそ',pg:71,lore:'帯山にすむ。馬のようで一本の角。火をよけることができる。'},
+{id:'shoken',n:'諸犍',k:'しょけん',pg:72,lore:'単張の山にすむ。豹のようで長い尾、人の頭に牛の耳、目は一つ。歩くときは尾をくわえる。'},
+{id:'sanki',n:'山𤟤',k:'さんき',pg:73,lore:'獄法の山にすむ。犬のようで人の顔。人を見ると笑い、風のように走る。現れると大風が吹く。'},
+{id:'shokai',n:'諸懐',k:'しょかい',pg:74,lore:'北嶽の山にすむ。牛に似て四本の角、人の目に豚の耳。人を食う。'},
+{id:'hakuba',n:'𩣡馬',k:'はくば',pg:75,lore:'旄水にすむ。牛の尾に白い体、一本の角。人を呼ぶような声で鳴く。'},
+{id:'houkyou',n:'狍鴞',k:'ほうきょう',pg:76,r:1,lore:'鉤吾の山にすむ。羊の体に人の顔、目はわきの下にあり、虎の歯に人の爪。なんでも食べつくす。'},
+{id:'ten',n:'驒',k:'てん',pg:77,lore:'太行の山にすむ。麢羊のようで四本の角、馬の尾に蹴爪がある。'},
+{id:'tenba',n:'天馬',k:'てんば',pg:78,lore:'馬成の山にすむ。白い犬のようで黒い頭。人を見ると飛んで逃げる。'},
+{id:'hiso',n:'飛鼠',k:'ひそ',pg:79,lore:'天池の山にすむ。兎のようで鼠の頭。背中の毛で空を飛ぶ。'},
+{id:'dondon',n:'䍶䍶',k:'とうとう',pg:80,lore:'泰戯の山にすむ。羊のようで一本の角に一つ目、目は耳のうしろにある。'},
+{id:'gen',n:'獂',k:'げん',pg:81,lore:'乾山にすむ。牛のようで三本足。'},
+{id:'hi',n:'羆',k:'ひ',pg:82,lore:'倫山にすむ。麋のようで、尻が尾の上にある。'},
+{id:'shoushou',n:'從從',k:'しょうしょう',pg:83,lore:'栒状の山にすむ。犬のようで六本足。自分の名を呼ぶように鳴く。'},
+{id:'shujuu',n:'朱獳',k:'しゅじゅ',pg:84,lore:'耿山にすむ。狐のようで魚の鰭がある。現れると国に恐れごとが起こる。'},
+{id:'heihei',n:'獙獙',k:'へいへい',pg:85,lore:'姑逢の山にすむ。狐のようで翼があり、雁のような声。現れると日照りになる。'},
+{id:'rouchitsu',n:'蠪蛭',k:'ろうしつ',pg:86,lore:'鳧麗の山にすむ。狐のようで九本の尾と九つの頭、虎の爪。赤子のような声で人を食う。'},
+{id:'yuuyuu',n:'峳峳',k:'ゆうゆう',pg:87,lore:'碣山にすむ。馬のようで羊の目、四本の角に牛の尾。現れると国にずるい者がふえる。'},
+{id:'fei',n:'蜚',k:'ひ',pg:88,lore:'太山にすむ。牛のようで白い頭、一つ目で蛇の尾。歩いた川は涸れ、草は枯れ、現れると疫病がはやる。'},
+{id:'bafuku',n:'馬腹',k:'ばふく',pg:89,lore:'蔓渠の山の伊水にすむ。人の顔に虎の体。赤子のような声で鳴き、人を食う。'},
+{id:'rin',n:'獜',k:'りん',pg:90,lore:'依軲の山にすむ。犬のようで虎の爪、体に鱗がある。よく跳ねる。'},
+{id:'heihou',n:'并封',k:'へいほう',pg:91,lore:'巫咸の東にすむ。豚のようで前と後ろに頭があり、体は黒い。'},
+{id:'joukou',n:'乗黄',k:'じょうこう',pg:92,r:1,lore:'白民の国にいる。狐のようで背中に角がある。乗った者は二千年生きる。'},
+{id:'sugo',n:'騶虞',k:'すうご',pg:93,r:1,lore:'林氏の国にすむ。虎ほどの大きさで五色の模様、尾は体より長い。乗れば一日に千里を走る。'},
+{id:'ki',n:'夔',k:'き',pg:94,r:1,lore:'東海の流波山にすむ。牛のようで角がなく一本足。出入りすれば必ず風雨がおこる。'},
+{id:'bouba',n:'旄馬',k:'ぼうば',pg:95,lore:'南海の外にすむ。馬のようで、足の四つの節に長い毛が生えている。'},
+{id:'jutteki',n:'跊踢',k:'じゅってき',pg:96,lore:'流沙の西にすむ。獣の体の左右に頭がある。'},
+{id:'soushou',n:'双双',k:'そうそう',pg:97,r:1,lore:'流沙の東にすむ。三頭の青い獣が一つの体になっている。'},
+{id:'choufu',n:'䳜鵂',k:'ちょうふ',pg:99,lore:'基山にすむ。鶏のようで三つの頭、六つの目、六本の足と三枚の翼。食べると眠らずにいられる。'},
+{id:'shu',n:'鴸',k:'しゅ',pg:100,lore:'柜山にすむ。鴟のようで人の手をもつ。現れると流罪が多くなる。'},
+{id:'kujo',n:'瞿如',k:'くじょ',pg:101,lore:'禱過の山にすむ。鵁のようで白い頭、三本の足に人の顔。'},
+{id:'gyou',n:'顒',k:'ぎょう',pg:102,lore:'令丘の山にすむ。梟のようで人の顔、四つの目と耳。現れると大日照りになる。'},
+{id:'takuhi',n:'橐𩇯',k:'たくひ',pg:103,lore:'羭次の山にすむ。梟のようで人の顔、一本足。冬に出て夏に眠る。'},
+{id:'rui',n:'鸓',k:'るい',pg:104,lore:'翠山にすむ。鵲のようで赤黒く、二つの頭と四本の足。火をふせぐ。'},
+{id:'fukei',n:'鳧徯',k:'ふけい',pg:105,lore:'鹿台の山にすむ。雄鶏のようで人の顔。現れると戦が起こる。'},
+{id:'hiyoku',n:'比翼鳥',k:'ひよくのとり',pg:106,r:1,lore:'崇吾の山にすむ蛮蛮という鳥。翼と目が一つずつで、二羽が寄りそってはじめて飛べる。'},
+{id:'hippou',n:'畢方',k:'ひっぽう',pg:107,r:1,lore:'章莪の山にすむ。鶴のようで一本足、青い体に赤い模様、白いくちばし。現れると怪しい火が起こる。'},
+{id:'shi',n:'鴟',k:'し',pg:108,lore:'三危の山にすむ。一つの頭に三つの体、鸛のような鳥。'},
+{id:'kiyo',n:'鵸鵌',k:'きよ',pg:109,lore:'翼望の山にすむ。烏のようで三つの頭と六本の尾。よく笑う。'},
+{id:'jinmenkyou',n:'人面鴞',k:'じんめんきょう',pg:110,lore:'崦嵫の山にすむ。鴞のようで人の顔、蜼の体に犬の尾。現れると大日照りになる。'},
+{id:'guuchou',n:'寓鳥',k:'ぐうちょう',pg:111,lore:'虢山にすむ。鼠のようで鳥の翼、羊のような声で鳴く。兵をふせぐ。'},
+{id:'shoushi',n:'竦斯',k:'しょうし',pg:112,lore:'灌題の山にすむ。雌雉のようで人の顔。人を見ると跳びはねる。'},
+{id:'bankyo',n:'䳌鶋',k:'ばんきょ',pg:113,lore:'北囂の山にすむ。烏のようで人の顔。夜に飛び、昼は伏せている。'},
+{id:'gou',n:'囂',k:'ごう',pg:114,lore:'梁渠の山にすむ。夸父のようで四枚の翼に一つ目、犬の尾。'},
+{id:'sanyo',n:'酸与',k:'さんよ',pg:116,lore:'景山にすむ。蛇のような鳥で四枚の翼、六つの目、三本の足。現れるとその地に恐れごとが起こる。'},
+{id:'shiso',n:'𪃍鼠',k:'しそ',pg:117,lore:'栒状の山にすむ。鶏のようで鼠の毛。現れると大日照りになる。'},
+{id:'taichou',n:'䲃鳥',k:'たいちょう',pg:118,lore:'首山の机谷にすむ。梟のようで三つの目、耳がある。'},
+{id:'kishou',n:'跂踵',k:'きしょう',pg:119,lore:'復州の山にすむ。鴞のようで一本足、豚の尾。現れると疫病がはやる。'},
+{id:'shokuchou',n:'鸀鳥',k:'しょくちょう',pg:120,lore:'互人の国にいる。青い鳥で黄色い体、赤い足に六つの頭。'},
+{id:'senki',n:'旋亀',k:'せんき',pg:121,lore:'杻陽の山の怪水にすむ。亀のようで鳥の頭、蝮の尾。木を割るような声で鳴く。'},
+{id:'riku',n:'鯥',k:'りく',pg:122,lore:'柢山にすむ。牛のような魚で蛇の尾、脇の下に翼。冬に死に夏に生きかえる。'},
+{id:'sekiju',n:'赤鱬',k:'せきじゅ',pg:123,lore:'青丘の山の英水にすむ。魚の体に人の顔、鴛鴦のような声。'},
+{id:'hii2',n:'肥𧔥',k:'ひい',pg:124,lore:'太華の山にすむ。蛇の形で六本の足と四枚の翼。現れると天下が大日照りになる。'},
+{id:'bunyou',n:'文鰩魚',k:'ぶんようぎょ',pg:125,lore:'泰器の山の川にすむ。鯉のようで鳥の翼、青い模様に白い頭。夜に西の海から東の海へ飛ぶ。'},
+{id:'keigyo',n:'鮭魚',k:'けいぎょ',pg:126,lore:'湡水にすむ。鼈のような魚で、羊のような声で鳴く。'},
+{id:'ragyo',n:'鸁魚',k:'らぎょ',pg:127,lore:'邽山の濛水にすむ。魚の体に鳥の翼、鴛鴦のような声。現れると大水が出る。'},
+{id:'johi',n:'絮魮魚',k:'じょひぎょ',pg:128,lore:'濫水にすむ。ひっくり返した鍋のような形に鳥の頭、魚の翼と尾。磬のような声で鳴き、珠玉を生む。'},
+{id:'yuugyo',n:'鯈魚',k:'ゆうぎょ',pg:129,lore:'帯山の川にすむ。鶏のようで赤い毛、三本の尾、六本の足、四つの頭。'},
+{id:'kara',n:'何羅魚',k:'からぎょ',pg:130,lore:'譙明の山の川にすむ。一つの頭に十の体をもつ魚。犬のような声で鳴く。'},
+{id:'shuushuu',n:'鰼鰼魚',k:'しゅうしゅうぎょ',pg:131,lore:'涿光の山の川にすむ。鵲のような魚で十枚の翼。火をふせぐ。'},
+{id:'chouda',n:'長蛇',k:'ちょうだ',pg:132,lore:'大咸の山にすむ。豚のような毛の生えた大蛇。拍子木を打つような声で鳴く。'},
+{id:'rakugyo',n:'鱳魚',k:'らくぎょ',pg:133,lore:'鯉のような魚で、鶏の足をもつ。'},
+{id:'shigyo',n:'鮨魚',k:'しぎょ',pg:134,lore:'諸懐の水にすむ。魚の体に犬の頭。赤子のような声で鳴く。'},
+{id:'hii',n:'肥遺',k:'ひい',pg:135,lore:'渾夕の山にすむ。一つの頭に二つの体をもつ蛇。現れると大日照りになる。'},
+{id:'ningyo',n:'人魚',k:'にんぎょ',pg:136,lore:'決決の水にすむ。四本足の魚で、赤子のような声で鳴く。'},
+{id:'shubetsu',n:'珠鼈魚',k:'しゅべつぎょ',pg:138,lore:'葛山の川にすむ。肺のような形で四つの目、六本の足。珠をもつ。'},
+{id:'kouko',n:'鮯鮯魚',k:'こうこうぎょ',pg:139,lore:'深沢にすむ。鯉のようで六本の足に鳥の尾。'},
+{id:'hakugyo',n:'薄魚',k:'はくぎょ',pg:140,lore:'石膏水にすむ。鱣のようで一つ目。現れると大日照りになる。'},
+{id:'katsugyo',n:'䱤魚',k:'かつぎょ',pg:141,lore:'子桐の水にすむ。魚のようで鳥の翼。出入りすると光り、現れると大日照りになる。'},
+{id:'meida',n:'鳴蛇',k:'めいだ',pg:142,lore:'鮮山にすむ。蛇のようで四枚の翼。磬を打つような声。現れると大日照りになる。'},
+{id:'kada',n:'化蛇',k:'かだ',pg:143,lore:'陽山にすむ。人の顔に豺の体、鳥の翼をもち、蛇のように這う。現れると大水が出る。'},
+{id:'higyo',n:'飛魚',k:'ひぎょ',pg:144,lore:'騩山の正回水にすむ。豚のようで赤い模様。食べると雷を恐れず、兵をふせぐ。'},
+{id:'sansoku',n:'三足亀',k:'さんそくき',pg:145,lore:'大苦の山の狂水にすむ三本足の亀。食べると大病にかからない。'},
+{id:'hada',n:'巴蛇',k:'はだ',pg:146,r:1,lore:'象を食べ、三年かけて骨を吐き出す大蛇。'},
+{id:'ryougyo',n:'陵魚',k:'りょうぎょ',pg:147,lore:'海の中にすむ。人の顔と人の手足、魚の体。'},
+{id:'ouryu',n:'応龍',k:'おうりゅう',pg:148,r:1,lore:'翼をもつ龍。黄帝のために蚩尤と戦い、南の地に雨をもたらした。'}
 ];
 const ASPECTS=[
   {id:'moku',ch:'木',name:'青木',color:'#3f7f5f'},
@@ -423,7 +436,9 @@ const ASPECTS=[
   {id:'kin',ch:'金',name:'白金',color:'#a8946a'},
   {id:'sui',ch:'水',name:'玄水',color:'#2f4f6f'}
 ];
-const OLDSP={slime:'teikou',neko:'kyubi',tori:'hippou',usagi:'kyubi',kuma:'shokai',ryu:'ouryu'};
+const OLDSP={slime:'teikou',neko:'kyubi',tori:'hippou',usagi:'kyubi',kuma:'shokai',ryu:'ouryu',saikyo:'fei',reiko:'shokai',reirei:'rokushoku',seiseigyu:'fei',gouyu:'goutei',toukou:'goutei',toutou:'heihou',ji:'kanso',bougyu:'gouin',kyuki:'sugo',ryoukyo:'tenkou',mougyoku:'sou',kaimei:'rikugo',rara:'sugo',kou:'shoushou',katsuso:'shoushou',sojo:'hiso',keihen:'shoushou',hihi:'tenkou',kitsuryou:'tenba',shuen:'chouyuu',youwa:'kyoho',seiei:'shu',ranchou:'kyuhou',houou:'kyuhou',sanseichou:'hiyoku',sushi:'shu',shouda:'fukei',chin:'hippou',kinhi:'kochou',shunchou:'kujo',atsuyu:'ouryu',enni:'souryu',kou2:'ouryu',zeni:'yuugyo',kokou:'riku',shiniku:'teikou',fusho:'kakujo',jukuko:'eishou'};
+/* names of retired beasts, so older hybrids can still find a parent's picture */
+const OLDN={'犀渠':'fei','領胡':'shokai','軨軨':'rokushoku','精精':'fei','合窳':'goutei','当康':'goutei','狪狪':'heihou','兕':'kanso','旄牛':'gouin','窮奇':'sugo','梁渠':'tenkou','孟極':'sou','開明獣':'rikugo','羅羅':'sugo','騶吾':'sugo','狡':'shoushou','猲狙':'shoushou','狙如':'hiso','谿辺':'shoushou','朏朏':'tenkou','孰湖':'eishou','夫諸':'kakujo','吉量':'tenba','朱厭':'chouyuu','雍和':'kyoho','精衛':'shu','鸞鳥':'kyuhou','鳳皇':'kyuhou','三青鳥':'hiyoku','數斯':'shu','象蛇':'fukei','鴆':'hippou','欽䲹':'kochou','鵕鳥':'kujo','燭龍':'shokuryu','窫窳':'ouryu','延維':'souryu','蛟':'ouryu','冉遺魚':'yuugyo','虎蛟':'riku','視肉':'teikou'};
 const spOf=id=>SPECIES.find(s=>s.id===id)||SPECIES.find(s=>s.id===OLDSP[id])||SPECIES[0];
 const beastOf=o=>(o&&o.hyb)||spOf(o&&o.species);
 const aspOf=id=>ASPECTS.find(a=>a.id===id)||ASPECTS[0];
@@ -440,22 +455,14 @@ function newPet(gen,week,name,hyb){
   if(hyb)p.hyb=hyb;
   return p;
 }
-/* breeding: the child takes its body from one parent and each part from either */
-const XFLAGS=['fire','thunder','glow','fivecolor','backhorns','fins','hump','pearl','tusk','whiteears','fourears','crest','backeyes','legfur','goldeyes','redeyes','redfeet','tigerclaw','hook'];
+/* breeding: the child wears one parent's picture with the other's showing through behind it */
+const artOf=P=>(P&&P.art&&P.art[0])||(P&&SPECIES.some(s=>s.id===P.id)?P.id:spOf(P&&P.id).id);
 function makeHybrid(A,B){
-  const pick=(a,b)=>Math.random()<.5?a:b;
-  const base=Math.random()<.5?A:B,other=base===A?B:A;
   const n1=Array.from(A.n)[0],n2=Array.from(B.n).slice(-1)[0];
-  const flags=((A.x||'')+' '+(B.x||'')).split(' ').filter(f=>XFLAGS.includes(f)&&Math.random()<.7);
-  const child={id:'hyb-'+rid(),n:n1===n2?A.n+B.n.slice(-1):n1+n2,k:'こうはいしゅ',t:base.t,
-    c:mix(A.c,B.c,.5),hc:pick(A.hc,B.hc),tc:pick(A.tc,B.tc),h:pick(A.h,B.h)||A.h||B.h,e:pick(A.e,B.e),
-    w:Math.max(A.w||0,B.w||0)&&Math.random()<.7?Math.max(A.w||0,B.w||0):pick(A.w,B.w),
-    tl:Math.max(A.tl||1,B.tl||1)>1&&Math.random()<.6?Math.max(A.tl||1,B.tl||1):pick(A.tl,B.tl),
-    tt:pick(A.tt,B.tt),hd:pick(A.hd,B.hd),hf:pick(A.hf,B.hf),lg:base.lg,m:pick(A.m,B.m)||A.m||B.m,mn:pick(A.mn,B.mn),
-    x:Array.from(new Set(flags)).join(' '),hybrid:1,parents:[A.n,B.n],
+  const front=Math.random()<.5;
+  return{id:'hyb-'+rid(),n:n1===n2?A.n+B.n.slice(-1):n1+n2,k:'こうはいしゅ',hybrid:1,parents:[A.n,B.n],
+    art:front?[artOf(A),artOf(B)]:[artOf(B),artOf(A)],
     lore:A.n+'と'+B.n+'のあいだに生まれた交配種。両方の特徴を少しずつ受けついでいる。'};
-  Object.keys(child).forEach(k=>child[k]==null&&delete child[k]);
-  return child;
 }
 function defaults(cur){
   const p=newPet(1,cur,'もち');p.bornAt=0;
@@ -475,6 +482,13 @@ function migrate(st){
   fix(p);if(!p.aspect)p.aspect=ASPECTS[hash(p.name+p.gen)%ASPECTS.length].id;
   st.plaza.forEach(e=>{fix(e);if(!e.aspect)e.aspect=ASPECTS[hash(e.variant||e.id)%ASPECTS.length].id;delete e.variant;if(!e.rank)e.rank=1;if(!e.aspects)e.aspects=[e.aspect]});
   st.graves.forEach(g=>{if(g.species&&!SPECIES.some(s=>s.id===g.species))g.species=OLDSP[g.species]});
+  /* beasts retired with the move to painted pictures: carry their dex record over to the one that replaced them */
+  Object.keys(st.dex).forEach(id=>{
+    if(SPECIES.some(s=>s.id===id)||!OLDSP[id])return;
+    const o=st.dex[id];delete st.dex[id];
+    seeDex(st,OLDSP[id],o.s||0,null,o.rank||0);(o.asp||[]).forEach(a=>seeDex(st,OLDSP[id],0,a));
+  });
+  [p.hyb,st.nextEgg].concat(st.plaza.map(e=>e.hyb)).forEach(h=>{if(h&&!h.art)h.art=artIds(Object.assign({hybrid:1},h))});
   st.plaza.forEach(e=>{if(!e.hyb)seeDex(st,e.species,MAXST,e.aspect,e.rank)});
   if(!p.dead&&(p.stage||0)>0&&!p.hyb)seeDex(st,p.species,p.stage);
   st.v=3;
@@ -586,281 +600,28 @@ function weekProgress(){
 const MOOD={happy:['上機嫌','good'],genki:['元気','good'],normal:['平静',''],weak:['衰弱','warn'],dying:['瀕死','bad']};
 const subjOf=id=>S.settings.subjects.find(s=>s.id===id)||{id,name:'削除した教科',color:'#9aa5af'};
 
-/* ---------- pet drawing: ink-wash beasts built from a body type plus parts ---------- */
-const INK='#231d17',SHU='#b23a28',GOFUN='#f3ecdc',GOLD='#c9a046';
+/* ---------- ink helpers for the egg, the grave and the plaza ---------- */
+const INK='#231d17',SHU='#b23a28',GOLD='#c9a046';
 const FX=' filter="url(#bp-ink)"';
 const B=(d,fill,op,w)=>'<path d="'+d+'" fill="'+fill+'" fill-opacity="'+(op==null?1:op)+'" stroke="'+INK+'" stroke-width="'+(w||2.4)+'" stroke-linejoin="round"'+FX+'/>';
 const Wsh=(d,fill,op)=>'<path d="'+d+'" fill="'+fill+'" fill-opacity="'+(op==null?.5:op)+'"/>';
 const L=(d,w,c,op,cls)=>'<path'+(cls?' class="'+cls+'"':'')+' d="'+d+'" fill="none" stroke="'+(c||INK)+'" stroke-width="'+(w||1.6)+'" stroke-linecap="round" stroke-linejoin="round"'+(op!=null?' stroke-opacity="'+op+'"':'')+FX+'/>';
-const D=(cx,cy,r,c)=>'<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="'+(c||INK)+'"/>';
-const G=(t,inner)=>'<g transform="'+t+'">'+inner+'</g>';
-const claws=(x,y,dir)=>L('M'+x+' '+y+' l'+(6*dir)+' 3 M'+x+' '+y+' l'+(7*dir)+' -1 M'+x+' '+y+' l'+(5*dir)+' -4',1.3);
-const limb=(d,c,w)=>L(d,(w||10)+3.5)+L(d,w||10,c);
-const darker=c=>mix(c,'#231d17',.35);
-function mix(a,b,t){const p=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));const x=p(a),y=p(b);return'#'+x.map((v,i)=>Math.round(v+(y[i]-v)*t).toString(16).padStart(2,'0')).join('')}
-const has=(P,f)=>(' '+(P.x||'')+' ').includes(' '+f+' ');
 
-/* body types: torso (no limbs), head, limbs, and anchor points for parts. All face left, feet on y=186. */
-const ARCH={
-ox:{torso:'M60 92 C 58 78, 70 68, 84 70 C 96 64, 112 70, 124 72 C 150 66, 176 72, 186 92 C 192 108, 188 128, 178 140 C 160 152, 128 152, 104 146 C 92 136, 86 124, 82 112 C 76 116, 66 116, 58 110 C 52 106, 52 96, 60 92 Z',
-  head:'M60 92 C 58 78, 70 68, 84 70 C 92 76, 94 94, 88 106 C 82 114, 66 116, 58 110 C 52 106, 52 96, 60 92 Z',hcx:74,hcy:92,
-  belly:'M104 146 C 128 150, 158 150, 176 140 C 160 128, 128 128, 104 146 Z',
-  near:['M171 136 C 176 150, 168 164, 173 182','M108 140 C 112 154, 104 166, 107 182'],far:['M160 142 C 164 156, 154 168, 157 182','M97 136 C 100 150, 92 164, 95 182'],mid:['M140 148 L 140 182','M128 148 L 127 182'],one:['M138 148 L 137 182'],
-  eye:[73,84],horn:[80,70],wing:[128,80],tail:[184,100],tailAng:-30,mouth:'M57 103 q6 3 11 -1',nose:[56,98],face:'M60 80 C 70 74, 84 76, 86 90 C 86 104, 76 112, 62 108 C 54 104, 54 88, 60 80 Z',
-  mane:['M92 72 c 6 -12, 18 -16, 26 -10','M98 76 c 8 -8, 18 -8, 24 -2','M106 72 c 8 -12, 20 -14, 28 -8','M118 72 c 8 -10, 18 -10, 24 -4'],
-  marks:[[132,86],[148,86],[164,92],[176,106],[122,102],[142,104],[160,110]],feet:'hoof',legW:10},
-cat:{torso:'M50 86 C 50 70, 64 62, 78 64 L 82 54 L 88 66 C 96 70, 104 78, 112 84 C 140 86, 170 88, 186 100 C 196 108, 196 126, 186 138 C 166 148, 134 150, 112 144 C 96 136, 80 120, 70 110 C 60 110, 50 104, 50 86 Z',
-  head:'M50 86 C 50 70, 64 62, 78 64 L 82 54 L 88 66 C 96 74, 96 92, 90 104 C 82 112, 64 112, 56 106 C 50 102, 50 94, 50 86 Z',hcx:72,hcy:86,
-  belly:'M112 144 C 134 148, 158 148, 180 138 C 166 128, 134 128, 112 144 Z',
-  near:['M182 134 C 184 150, 184 166, 188 182','M104 138 C 102 152, 102 166, 104 182'],far:['M170 140 C 172 154, 172 168, 174 182','M114 142 C 112 156, 110 170, 108 182'],mid:['M146 146 C 146 160, 146 170, 148 182','M134 146 L 132 182'],one:['M144 146 L 144 182'],
-  eye:[65,78],horn:[76,64],wing:[118,84],tail:[190,104],tailAng:-20,mouth:'M52 100 c 6 4, 14 4, 18 0',nose:[51,88],fangs:'M56 101 l2 6 M64 102 l1 5',face:'M52 76 C 62 68, 78 70, 86 82 C 90 96, 82 108, 66 108 C 54 106, 48 90, 52 76 Z',
-  mane:['M84 68 c 8 -8, 18 -8, 24 -2','M90 74 c 10 -6, 20 -4, 26 4','M96 80 c 10 -4, 18 0, 22 8'],
-  marks:[[130,92],[146,92],[162,96],[178,108],[120,110],[140,114],[158,118]],feet:'claw',legW:10},
-fox:{torso:'M44 70 C 52 62, 62 58, 70 56 L 72 34 L 82 52 C 88 50, 94 52, 98 56 C 104 66, 106 80, 112 92 C 132 98, 150 112, 158 134 C 162 152, 156 170, 144 180 L 116 182 C 104 176, 96 160, 92 140 C 84 124, 82 108, 84 96 C 76 90, 64 84, 56 80 C 50 78, 44 74, 44 70 Z',
-  head:'M44 70 C 52 62, 62 58, 70 56 L 72 34 L 82 52 C 88 50, 94 52, 98 56 C 100 68, 96 82, 86 90 C 76 90, 64 84, 56 80 C 50 78, 44 74, 44 70 Z',hcx:72,hcy:66,
-  ear:'M78 54 L 88 34 L 94 54 Z',belly:'M84 96 C 94 104, 98 120, 94 136 C 88 126, 84 112, 84 96 Z',
-  near:['M96 138 L 94 182','M124 164 C 130 174, 138 178, 150 182'],far:['M106 142 L 105 182'],mid:['M110 150 L 110 182','M84 146 L 82 182'],one:['M100 140 L 100 182'],
-  eye:[65,64],horn:[80,48],wing:[112,92],tail:[150,154],tailAng:0,fan:1,mouth:'M48 76 q6 2 12 0',nose:[45,70],face:'M50 60 C 58 54, 74 54, 84 62 C 90 74, 82 86, 68 86 C 56 84, 46 72, 50 60 Z',
-  mane:['M98 60 c 8 -6, 16 -6, 22 0','M104 70 c 8 -4, 16 -2, 20 4'],
-  marks:[[112,104],[126,114],[140,126],[148,144],[132,150],[118,130]],feet:'paw',legW:9},
-horse:{torso:'M66 44 C 72 36, 86 36, 92 44 C 98 54, 102 70, 110 82 C 134 80, 166 80, 184 90 C 196 98, 198 114, 190 126 C 170 136, 136 138, 112 132 C 100 124, 92 110, 86 98 C 82 88, 78 74, 72 66 C 66 70, 56 72, 50 68 C 44 64, 48 54, 56 50 Z',
-  head:'M66 44 C 72 36, 86 36, 92 44 C 94 54, 88 64, 78 68 C 66 72, 56 72, 50 68 C 44 64, 48 54, 56 50 Z',hcx:70,hcy:54,
-  belly:'M112 132 C 136 138, 168 136, 186 124 C 170 116, 136 116, 112 132 Z',
-  near:['M184 120 C 192 136, 182 152, 188 182','M114 128 C 118 146, 108 160, 112 182'],far:['M174 126 C 180 142, 170 156, 176 182','M104 124 C 108 140, 98 156, 102 182'],mid:['M150 134 L 150 182','M140 134 L 139 182'],one:['M148 134 L 148 182'],
-  eye:[70,50],horn:[80,40],wing:[128,86],tail:[192,98],tailAng:10,mouth:'M50 66 q5 2 9 0',nose:[50,60],face:'M52 46 C 60 38, 76 38, 84 46 C 88 58, 80 68, 66 70 C 54 70, 46 60, 52 46 Z',
-  mane:['M88 44 c 6 8, 10 18, 14 28','M92 50 c 8 10, 12 20, 14 30','M86 42 c 8 4, 14 12, 18 20','M96 58 c 8 8, 12 16, 14 24'],
-  marks:[[128,92],[144,90],[160,92],[176,100],[120,110],[140,112],[160,114]],feet:'hoof',legW:8},
-ape:{torso:'M78 46 C 84 36, 100 36, 106 46 C 112 58, 110 70, 104 76 C 120 82, 136 96, 140 118 C 144 136, 140 152, 128 160 C 114 166, 100 162, 94 150 C 88 138, 86 124, 86 112 C 84 100, 82 90, 80 80 C 72 78, 66 70, 68 60 C 70 52, 74 48, 78 46 Z',
-  head:'M78 46 C 84 36, 100 36, 106 46 C 112 58, 110 70, 104 76 C 96 82, 84 82, 80 80 C 72 78, 66 70, 68 60 C 70 52, 74 48, 78 46 Z',hcx:88,hcy:60,
-  belly:'M96 104 C 108 108, 120 124, 120 144 C 108 140, 98 126, 96 104 Z',
-  near:['M94 90 C 80 112, 70 140, 64 182','M126 156 C 140 164, 148 174, 152 182'],far:['M102 94 C 96 120, 88 150, 84 182','M112 160 C 112 170, 110 178, 108 182'],mid:[],one:[],
-  eye:[82,58],horn:[92,40],wing:[116,90],tail:[134,152],tailAng:30,mouth:'M76 72 q6 2 10 0',nose:[76,64],face:'M72 50 C 80 44, 94 46, 98 56 C 100 70, 92 78, 82 78 C 72 76, 68 62, 72 50 Z',alwaysFace:1,
-  mane:['M100 42 c 8 -4, 14 0, 16 6','M106 52 c 8 -2, 12 4, 12 10','M104 62 c 8 0, 12 6, 10 12'],
-  marks:[[104,98],[116,110],[126,124],[130,140],[110,124]],feet:'claw',legW:9},
-crane:{torso:'M96 104 C 110 88, 150 86, 172 98 C 196 112, 210 140, 222 168 C 200 158, 176 150, 156 146 C 136 148, 112 140, 100 128 C 92 120, 90 110, 96 104 Z',
-  neck:'M102 108 C 84 96, 84 72, 96 58 C 106 46, 100 34, 88 36',head:'M80 36 C 82 28, 94 26, 98 34 C 98 40, 90 44, 84 42 Z',hcx:89,hcy:35,beak:'M82 35 L 46 54 L 85 41 Z',
-  wingNear:'M110 100 C 132 90, 164 96, 184 122 C 162 114, 140 116, 120 122 Z',
-  near:['M142 146 L 138 184','M156 146 L 160 184','M128 144 L 122 184','M168 146 L 174 184'],legBird:1,
-  eye:[89,34],horn:[92,28],wing:[128,98],tail:[186,130],tailAng:30,face:'M80 30 C 86 24, 98 26, 100 34 C 100 42, 92 46, 84 44 C 78 40, 76 34, 80 30 Z',
-  mane:['M94 30 C 100 18, 112 18, 116 8','M96 32 C 106 26, 118 28, 126 20','M92 28 C 92 16, 98 8, 104 2'],
-  marks:[[132,132],[146,136],[160,138],[118,126]],feet:'bird'},
-fowl:{torso:'M80 120 C 80 92, 106 78, 134 80 C 164 84, 184 104, 186 130 C 188 150, 170 166, 142 168 C 112 170, 84 156, 80 120 Z',
-  neck:'M84 108 C 76 96, 74 84, 80 76',head:'M62 82 C 62 66, 80 58, 94 64 C 104 70, 104 86, 94 92 C 82 98, 66 96, 62 82 Z',hcx:80,hcy:78,beak:'M64 77 L 46 84 L 64 87 Z',
-  wingNear:'M108 104 C 130 92, 164 98, 182 126 C 160 120, 138 124, 116 134 Z',
-  near:['M122 166 L 118 184','M146 166 L 148 184','M134 168 L 134 184','M158 162 L 164 184'],legBird:1,
-  eye:[78,76],horn:[84,62],wing:[128,98],tail:[182,122],tailAng:20,face:'M66 70 C 74 62, 92 62, 98 74 C 100 86, 92 94, 80 94 C 68 92, 62 82, 66 70 Z',
-  mane:['M84 62 c 2 -10, 10 -14, 16 -12','M88 64 c 6 -8, 14 -8, 18 -4'],
-  marks:[[120,110],[136,106],[152,112],[126,130],[146,132]],feet:'bird'},
-fish:{torso:'M40 112 C 60 84, 110 76, 150 88 C 170 94, 184 104, 192 110 C 184 116, 170 126, 150 132 C 110 144, 60 140, 40 112 Z',
-  head:'M40 112 C 50 98, 64 90, 78 88 C 84 100, 84 124, 78 136 C 64 134, 50 126, 40 112 Z',hcx:60,hcy:112,
-  belly:'M60 126 C 90 140, 130 138, 160 126 C 130 130, 90 132, 60 126 Z',
-  fins:['M110 84 C 116 66, 136 62, 150 70 C 140 76, 132 82, 128 88 Z','M96 130 C 100 146, 116 152, 128 148 C 118 142, 112 136, 110 132 Z'],
-  near:['M80 134 C 78 150, 74 164, 70 176','M110 138 C 110 152, 108 166, 106 176','M140 134 C 142 148, 144 162, 146 176'],far:['M95 136 L 92 176','M125 136 L 126 176','M155 130 L 160 176'],legsLift:1,
-  eye:[56,104],horn:[66,90],wing:[104,96],tail:[188,110],tailAng:0,fishTail:1,mouth:'M41 114 q6 2 10 -1',face:'M42 100 C 50 90, 70 90, 78 100 C 82 116, 74 130, 60 130 C 48 128, 40 116, 42 100 Z',
-  mane:['M76 90 c 6 -10, 16 -12, 22 -6'],marks:[[96,100],[114,96],[132,100],[150,104],[104,118],[124,120],[144,118]],feet:'claw',legW:6,lift:14},
-serpent:{coil:'M78 74 C 70 100, 76 122, 104 128 C 142 136, 184 132, 186 156 C 188 178, 140 186, 104 182 C 72 178, 58 164, 70 152 C 84 140, 122 150, 152 156',
-  head:'M50 64 C 54 50, 72 44, 86 50 C 96 56, 94 70, 84 74 C 72 78, 58 76, 50 70 Z',hcx:72,hcy:62,
-  eye:[70,58],horn:[78,50],wing:[118,112],tail:[152,156],mouth:'M50 68 q8 4 16 2',face:'M54 54 C 62 46, 80 46, 88 56 C 92 68, 82 76, 70 76 C 58 74, 50 64, 54 54 Z',
-  mane:['M86 56 c 8 -6, 16 -4, 20 2','M88 66 c 8 -2, 14 2, 16 8','M80 80 c 8 0, 14 4, 16 10'],marks:[[96,126],[120,132],[150,136],[176,146],[140,176],[100,176]],feet:'claw'},
-dragon:{body:'M76 82 C 104 64, 128 104, 150 112 C 178 122, 204 104, 198 80 C 194 62, 210 50, 226 58',
-  head:'M30 78 C 36 64, 54 56, 72 62 C 84 66, 86 82, 78 90 C 66 96, 50 94, 38 90 L 26 88 Z',hcx:56,hcy:76,
-  near:['M112 90 C 112 104, 106 116, 100 124','M170 120 C 174 134, 172 146, 166 154'],far:['M126 100 C 128 112, 124 122, 118 128','M186 112 C 190 124, 190 136, 186 144'],mid:['M140 108 C 142 120, 140 130, 134 138'],
-  eye:[58,70],horn:[64,60],wing:[124,94],tail:[226,58],tailAng:-40,mouth:'M30 86 C 44 92, 58 94, 70 90',face:'M34 70 C 44 60, 66 60, 76 68 C 82 80, 74 92, 58 92 C 44 92, 30 82, 34 70 Z',
-  legW:6,mane:['M96 70 c 4 -10, 12 -14, 20 -10','M150 104 c 6 -10, 16 -12, 22 -6','M182 100 c 8 -10, 18 -10, 24 -4','M76 66 c 6 -10, 14 -12, 22 -8'],marks:[],feet:'claw'},
-turtle:{shell:'M68 152 C 68 104, 108 84, 146 88 C 182 92, 204 122, 198 152 Z',
-  head:'M34 132 C 38 120, 54 116, 64 122 C 70 128, 68 140, 58 142 C 48 144, 38 142, 34 138 Z',neck:'M66 136 C 72 134, 76 136, 82 140',hcx:50,hcy:130,
-  near:['M84 150 C 80 162, 76 172, 72 180','M180 150 C 184 162, 186 172, 190 180','M132 154 L 132 180'],far:['M100 150 L 98 180','M164 152 L 166 180','M116 154 L 114 180'],
-  eye:[46,128],horn:[52,120],wing:[130,96],tail:[198,146],tailAng:20,mouth:'M35 136 q6 2 10 0',face:'M38 124 C 44 116, 60 116, 66 124 C 68 134, 62 142, 50 142 C 40 140, 34 132, 38 124 Z',
-  mane:['M60 118 c 6 -6, 14 -6, 18 0'],marks:[],feet:'claw',legW:9},
-sack:{body:'M70 110 C 66 80, 96 62, 128 64 C 164 66, 188 88, 184 118 C 180 144, 152 156, 124 154 C 94 152, 72 136, 70 110 Z',hcx:128,hcy:110,
-  legs:['M96 146 C 90 160, 94 170, 86 184','M110 150 C 108 164, 110 172, 104 184','M124 152 C 124 166, 124 174, 120 184','M138 152 C 140 166, 140 174, 140 184','M152 150 C 156 164, 156 172, 158 184','M166 146 C 172 160, 170 170, 176 184'],
-  eye:[112,104],horn:[128,66],wing:[96,84],tail:[182,120],tailAng:0,marks:[],feet:'claw'}
+/* ---------- pet pictures: the beasts as painted in the Qing album 山海經圖 ----------
+   幼獣 is seen through thick mist, 若獣 through a thin one, 成獣 and 神獣 clearly. */
+const ART='art/';
+const ARTBOX={x:22,y:12,w:212,h:178};
+const artIds=P=>{
+  if(P.art&&P.art.length)return P.art;
+  if(P.hybrid){const ids=(P.parents||[]).map(n=>(SPECIES.find(s=>s.n===n)||{}).id).filter(Boolean);
+    return ids.length?ids:[SPECIES[hash(P.id)%SPECIES.length].id]}
+  return [P.id];
 };
-const HORN={
-  ox:k=>L('M4 2 C 10 -14, 24 -20, 32 -14',4.5*k)+L('M-4 2 C -8 -12, -4 -22, 6 -26',4.5*k),
-  four:k=>L('M4 2 C 10 -14, 24 -20, 32 -14',4*k)+L('M-4 2 C -8 -12, -4 -22, 6 -26',4*k)+L('M10 4 C 18 -4, 28 -4, 34 2',3*k)+L('M-8 4 C -16 -2, -22 -10, -20 -18',3*k),
-  antler:k=>L('M2 0 C 4 -16, -2 -28, 6 -42',4*k)+L('M4 -20 C 12 -24, 16 -30, 18 -36',3*k)+L('M-8 2 C -12 -14, -20 -24, -16 -38',4*k)+L('M-12 -18 C -20 -20, -24 -26, -26 -32',3*k),
-  antler4:k=>HORN.antler(k)+L('M6 -32 C 12 -36, 14 -42, 14 -48',2.6*k)+L('M-15 -30 C -20 -34, -22 -40, -20 -46',2.6*k),
-  one:k=>B('M-4 0 C -6 -16, -2 -30, 8 -40 C 6 -26, 6 -12, 4 0 Z',GOFUN,1,1.8),
-  ram:k=>L('M2 0 C 16 -8, 24 6, 14 12 C 6 16, 2 8, 8 4',4.5*k),
-  nub:k=>L('M0 0 l2 -7 M-8 2 l-1 -7',3.5)
-};
-const WING='M0 0 C 10 -34, 42 -54, 88 -62 C 76 -50, 72 -44, 82 -40 C 66 -36, 58 -30, 68 -24 C 52 -22, 42 -16, 50 -10 C 34 -6, 18 -2, 8 8 Z';
-function wings(P,cf,a,far){
-  if(!P.w||a<2)return'';
-  const k=[0,0,.55,.85,1][a],[x,y]=cf.wing;let s='';
-  for(let i=0;i<P.w;i++){const r=(far?-14:0)+i*22,sc=k*(1-i*.18);
-    s+=G('translate('+(x+(far?8:0))+' '+(y+i*6)+') rotate('+r+') scale('+sc.toFixed(2)+')',B(WING,far?'#5a5248':(P.wc||'#d8d0c0'),far?.5:.9,2)+(far?'':Wsh('M0 0 C 10 -34, 42 -54, 88 -62 C 60 -46, 30 -26, 0 0 Z','#3a332b',.35)+L('M10 -6 C 30 -26, 56 -40, 80 -50',1.2,INK,.7)+L('M14 0 C 32 -14, 50 -22, 66 -26',1.1,INK,.6)+L('M20 4 C 34 -4, 44 -8, 50 -10',1,INK,.5)))}
-  return s;
-}
-function tails(P,cf,a){
-  if(!cf.tail)return'';
-  const n=Math.max(1,Math.round((P.tl||1)*[0,.34,.67,1,1][a])),tt=P.tt||(cf.fan?'fox':'plain');
-  const [x,y]=cf.tail,tc=P.tc||P.c;let s='';
-  for(let i=0;i<n;i++){
-    const ang=(cf.tailAng||0)+(n>1?(-34+i*(68/(n-1))):0);let t='';
-    if(tt==='fox')t=B('M0 0 C 8 -18, 38 -36, 74 -30 C 88 -27, 90 -12, 79 -8 C 50 -12, 20 -4, 0 0 Z',tc,.92,2)+Wsh('M74 -30 C 88 -27, 90 -12, 79 -8 C 76 -15, 72 -23, 74 -30 Z','#fbf6ea',1);
-    else if(tt==='snake')t=L('M0 0 C 22 -4, 32 -26, 22 -42 C 14 -56, 24 -72, 40 -68',9)+L('M0 0 C 22 -4, 32 -26, 22 -42 C 14 -56, 24 -72, 40 -68',5,'#6e7656')+B('M36 -74 C 46 -78, 56 -72, 52 -64 C 48 -60, 38 -62, 36 -68 Z','#6e7656',1,1.8);
-    else if(tt==='horse')t=L('M0 0 C 16 4, 24 20, 22 40 M2 2 C 20 8, 30 22, 32 38 M0 4 C 10 16, 12 30, 10 44',2.6,darker(tc));
-    else if(tt==='long')t=L('M0 0 C 30 -10, 46 10, 40 34 C 36 52, 52 60, 66 52',6)+L('M0 0 C 30 -10, 46 10, 40 34 C 36 52, 52 60, 66 52',3,tc);
-    else if(tt==='tuft')t=L('M0 0 C 24 -6, 32 18, 26 34',4.5)+B('M22 32 C 32 30, 38 42, 30 48 C 22 50, 18 40, 22 32 Z',INK,1,1.4);
-    else if(cf.fishTail)t=B('M0 0 C 16 -18, 32 -26, 44 -30 C 38 -12, 38 12, 44 30 C 32 26, 16 18, 0 0 Z',tc,.85,2);
-    else if(cf.feet==='bird')t=L('M0 0 C 18 18, 30 36, 44 56',2,INK,.85)+L('M-2 6 C 12 26, 18 44, 22 62',2,darker(tc))+L('M4 -4 C 24 8, 40 20, 52 36',1.6,SHU,.85);
-    else t=L('M0 0 C 24 -6, 34 18, 26 34 C 22 44, 32 50, 40 46',6)+L('M0 0 C 24 -6, 34 18, 26 34 C 22 44, 32 50, 40 46',3,tc);
-    s+=G('translate('+x+' '+y+') rotate('+ang.toFixed(1)+')',t);
-  }
-  return s;
-}
-function marks(P,cf){
-  if(!P.m||!cf.marks)return'';let s='';
-  cf.marks.forEach(([x,y],i)=>{
-    if(P.m==='stripe')s+=L('M'+x+' '+(y-8)+' c 3 6, 2 12, -3 16',2.4,INK,.85);
-    else if(P.m==='spot')s+='<circle cx="'+x+'" cy="'+y+'" r="3.4" fill="none" stroke="'+INK+'" stroke-width="1.6"'+FX+'/>';
-    else if(P.m==='scale')s+=L('M'+(x-5)+' '+y+' q5 -6 10 0',1.4,INK,.7);
-  });
-  if(has(P,'fivecolor'))cf.marks.forEach(([x,y],i)=>{s+='<circle cx="'+x+'" cy="'+(y+4)+'" r="4" fill="'+['#b23a28','#3f7f5f','#d6a23c','#4f6f88','#f3ecdc'][i%5]+'" fill-opacity=".8"/>'});
-  return s;
-}
-function eyes(P,cf){
-  const [x,y]=cf.eye,e=P.e==null?2:P.e;let s='';
-  const human=P.hf||cf.alwaysFace;
-  const one=(cx,cy,r)=>human?'<path d="M'+(cx-6)+' '+cy+' q6 -4.5 12 0 q-6 4 -12 0 Z" fill="'+GOFUN+'" stroke="'+INK+'" stroke-width="1.3"/>'+D(cx,cy,1.8):'<ellipse cx="'+cx+'" cy="'+cy+'" rx="'+(r||4.6)+'" ry="'+((r||4.6)*.62)+'" fill="'+(has(P,'goldeyes')||has(P,'redeyes')?(has(P,'redeyes')?SHU:'#d9a43a'):SHU)+'"/>'+D(cx,cy,1.6);
-  if(e===1)return'<ellipse cx="'+x+'" cy="'+(y-2)+'" rx="6" ry="4" fill="'+SHU+'"/>'+D(x,y-2,2.2);
-  s+=one(x,y);
-  if(e===3)s+='<ellipse cx="'+(x+6)+'" cy="'+(y-11)+'" rx="2" ry="4" fill="'+SHU+'"/>'+D(x+6,y-11,1.1);
-  if(e>=4)s+=one(x+10,y-1,3.4)+one(x+4,y-10,3)+(e>=6?one(x+14,y-11,2.8)+one(x-4,y+8,2.6)+one(x+12,y+8,2.6):'');
-  return s;
-}
-function headExtras(P,cf,a,col){
-  let s='';
-  const hcol=P.hc||col;
-  if(P.hf===1||(P.hf&&P.hf!=='eyes'))s+=B(cf.face,mix(GOFUN,hcol,.15),.96,1.8)+(cf.mouth?L(cf.mouth,1.6,SHU):'');
-  else if(cf.mouth)s+=L(cf.mouth,1.4)+(cf.fangs&&a>=2?L(cf.fangs,1.4):'')+(cf.nose?D(cf.nose[0],cf.nose[1],1.6):'');
-  if(cf.beak)s+=B(cf.beak,has(P,'hook')?'#3a332b':(P.t==='fowl'?'#d9a43a':GOFUN),1,1.8);
-  if(has(P,'beak'))s+=B('M38 128 L 22 134 L 38 138 Z','#3a332b',1,1.6);
-  s+=eyes(P,cf);
-  if(!P.hf&&!cf.alwaysFace&&P.e!==1&&a>=2){const [x,y]=cf.eye;s+=L('M'+(x-7)+' '+(y-7)+' L'+(x+7)+' '+(y-4),2.2)}
-  if(P.h&&a>=1&&HORN[P.h]){const [hx,hy]=cf.horn,k=[0,.5,.75,1,1.12][a];s+=G('translate('+hx+' '+hy+') scale('+k+')',HORN[P.h](1))}
-  if(has(P,'tusk'))s+=L('M58 106 c -6 2, -10 -2, -10 -8',3,GOFUN)+L('M58 106 c -6 2, -10 -2, -10 -8',1,INK);
-  if(has(P,'whiteears'))s+=B('M'+(cf.hcx+8)+' '+(cf.hcy-14)+' l6 -10 l4 12 Z',GOFUN,1,1.6);
-  if(has(P,'fourears'))s+=B('M96 42 l6 -12 l4 12 Z',mix(col,GOFUN,.3),1,1.6)+B('M86 40 l2 -12 l6 10 Z',mix(col,GOFUN,.3),1,1.6)+B('M104 50 l10 -6 l-2 10 Z',mix(col,GOFUN,.3),1,1.6);
-  if(has(P,'owl'))s+=B('M'+(cf.hcx-6)+' '+(cf.hcy-14)+' l-4 -12 l10 8 Z',col,1,1.6)+B('M'+(cf.hcx+8)+' '+(cf.hcy-14)+' l4 -12 l-10 8 Z',col,1,1.6);
-  if(has(P,'crest')&&a>=2)s+=L('M'+cf.horn[0]+' '+cf.horn[1]+' c 2 -12, 10 -18, 18 -16',2.4,SHU,null,'wisp')+L('M'+(cf.horn[0]+4)+' '+cf.horn[1]+' c 6 -8, 16 -10, 22 -4',2,SHU,null,'wisp');
-  if(has(P,'doghead'))s+=B('M50 94 l-2 -14 l10 8 Z',col,1,1.6);
-  return s;
-}
-function extraHeads(P,cf,a,col){
-  const n=(P.hd||1)-1;if(n<1||a<2||!cf.head)return'';
-  const shown=Math.max(1,Math.round(n*[0,0,.5,1,1][a]));let s='';
-  for(let j=0;j<shown;j++){
-    const ang=(-160+j*(shown>1?120/(shown-1):0))*Math.PI/180,rad=n>2?34:22;
-    const dx=Math.cos(ang)*rad,dy=Math.sin(ang)*rad,sc=n>2?.55:.85;
-    s+=L('M'+cf.hcx+' '+cf.hcy+' L'+(cf.hcx+dx)+' '+(cf.hcy+dy),6,darker(col),.9);
-    s+=G('translate('+(cf.hcx+dx)+' '+(cf.hcy+dy)+') scale('+sc+') translate('+(-cf.hcx)+' '+(-cf.hcy)+')',B(cf.head,P.hc||col,1,2.4)+(P.hf?B(cf.face,GOFUN,.96,1.8):'')+eyes(Object.assign({},P,{e:2}),cf));
-  }
-  return s;
-}
-function legs(P,cf,col,list,far){
-  const w=cf.legW||10,c=far?darker(col):col;
-  if(cf.legBird)return list.map(d=>L(d,3.2)).join('');
-  return list.map(d=>far?L(d,w,c):limb(d,c,w)).join('')+(far?'':list.map(d=>{const e=d.trim().split(/[ ,]+/).slice(-2).map(Number);
-    if(has(P,'legfur'))return L('M'+(e[0]-6)+' '+(e[1]-16)+' c 2 6, 0 12, -4 16 M'+(e[0]+6)+' '+(e[1]-16)+' c 2 6, 2 12, 0 16',2,INK,.8);
-    return cf.feet==='hoof'?L('M'+(e[0]+5)+' '+e[1]+' l-11 0',4):cf.feet==='claw'||has(P,'tigerclaw')?claws(e[0],e[1],-1):''}).join(''));
-}
-function legSet(P,cf){
-  if(!cf.near)return{near:[],far:[]};
-  const lg=P.lg==null?(cf.legBird?2:(cf.legsLift?0:4)):P.lg;
-  if(cf.legBird)return{near:cf.near.slice(0,Math.max(0,lg)),far:[]};
-  if(lg===0)return{near:[],far:[]};
-  if(lg===1)return{near:cf.one||[],far:[]};
-  if(lg===3)return{near:cf.near.slice(0,2).concat(cf.mid?cf.mid.slice(0,1):[]),far:[]};
-  if(lg>=6)return{near:cf.near.concat(cf.mid?cf.mid.slice(0,1):[]),far:cf.far.concat(cf.mid?cf.mid.slice(1):[])};
-  return{near:cf.near,far:cf.far};
-}
-
-/* draw one beast for stage a (1-4) */
-function drawBeast(P,a){
-  const cf=ARCH[P.t]||ARCH.ox,col=P.c||'#8a7458';let s='';
-  const ls=legSet(P,cf);
-  if(cf.lift)s+='<g transform="translate(0 -'+cf.lift+')">';
-  if(P.t==='sack'){
-    s+=wings(P,cf,Math.max(a,2),true)+wings(P,Object.assign({},cf,{wing:[160,84]}),Math.max(a,2),true);
-    (cf.legs.slice(0,P.lg==null?6:P.lg)).forEach((d,i)=>{s+=L(d,3.4);const e=d.split(' ').slice(-2).map(Number);s+=claws(e[0],e[1],i<3?-1:1)});
-    s+=B(cf.body,col,.92)+'<ellipse cx="128" cy="112" rx="40" ry="28" fill="#c8452c" fill-opacity=".32"/>';
-    s+=L('M106 104 c 8 -9, 22 -5, 20 6 c -2 8, -13 8, -13 2',1.6,darker(col))+L('M138 96 c 8 -8, 20 -4, 18 6 c -2 7, -11 7, -11 2',1.4,darker(col));
-    if(P.e)s+=eyes(P,{eye:[112,108]})+(P.e>=2?eyes(Object.assign({},P,{e:2}),{eye:[140,104]}):'');
-    if(a>=3)s+=L('M100 66 c -4 -12, 2 -22, 12 -24',2,SHU,.9,'wisp')+L('M128 64 c 0 -12, 6 -20, 14 -22',2,SHU,.9,'wisp')+L('M154 68 c 4 -12, 12 -18, 20 -18',2,SHU,.9,'wisp');
-    return s+(cf.lift?'</g>':'');
-  }
-  if(P.t==='serpent'){
-    s+=wings(P,cf,a,true);
-    if(has(P,'twobody'))s+=G('translate(14 -10)',L(cf.coil,20)+L(cf.coil,14,darker(col)));
-    const w=has(P,'big')?26:20;
-    s+=L(cf.coil,w)+L(cf.coil,w-6,col)+'<path d="'+cf.coil+'" fill="none" stroke="'+INK+'" stroke-width="'+(w-12)+'" stroke-dasharray="2 7" stroke-opacity=".35"/>';
-    if(P.mn&&a>=2)s+=L(cf.coil,w+6,P.mn,.25);
-    s+=L('M80 74 C 76 64, 74 60, 76 56',12)+L('M80 74 C 76 64, 74 60, 76 56',8,col);
-    s+=wings(P,cf,a,false)+extraHeads(P,cf,a,col)+B(cf.head,P.hc||col,1)+headExtras(P,cf,a,col);
-    if(has(P,'glow'))s+='<circle cx="72" cy="62" r="30" fill="#f2c94c" fill-opacity=".18"/>';
-    return s+(cf.lift?'</g>':'');
-  }
-  if(P.t==='dragon'){
-    s+=wings(P,cf,a,true)+legs(P,cf,col,cf.far,true);
-    s+=L(cf.body,21)+L(cf.body,15,col)+'<path d="'+cf.body+'" fill="none" stroke="#2c3a2a" stroke-width="9" stroke-dasharray="2 6" stroke-opacity=".5"/>';
-    s+=L('M84 86 C 108 74, 128 112, 150 118 C 176 126, 200 112, 200 92',3,'#d9c27a',.9);
-    s+=legs(P,cf,col,cf.near.concat(P.lg>=6?cf.mid:[]),false);
-    if(a>=3)s+=L('M226 58 c 6 -6, 10 -14, 8 -22',2,SHU,null,'wisp')+L('M226 58 c 8 -2, 12 -8, 14 -14',1.6,SHU,null,'wisp');
-    s+=wings(P,cf,a,false)+extraHeads(P,cf,a,col)+B(cf.head,P.hc||col,1)+headExtras(P,cf,a,col);
-    if(a>=3)s+=L('M32 82 C 18 90, 12 106, 22 118',1.5,INK,null,'wisp')+L('M40 90 C 34 104, 40 118, 52 124',1.3,INK,null,'wisp');
-    return s;
-  }
-  if(P.t==='turtle'){
-    s+=tails(P,cf,a)+legs(P,cf,col,legSet(P,cf).far.length?cf.far:[],true);
-    const near=(P.lg===3?cf.near:P.lg>=6?cf.near.concat(cf.far):cf.near.slice(0,2).concat([cf.far[1]]));
-    s+=near.map(d=>limb(d,col,9)).join('');
-    s+=L(cf.neck,12)+L(cf.neck,8,col)+B(cf.shell,darker(col),.9)+L('M96 110 l18 -10 l20 6 l0 20 l-20 8 l-18 -8 Z M134 106 l22 -4 l18 12 M114 134 l-6 16 M134 132 l14 16',1.4,GOFUN,.6);
-    s+=B(cf.head,P.hc||col,1)+headExtras(P,cf,a,col);
-    if(has(P,'pearl'))s+='<circle cx="132" cy="80" r="7" fill="#f6efe0" stroke="'+GOLD+'" stroke-width="1.6"/>';
-    return s;
-  }
-  /* four-legged, apes, birds, fish */
-  s+=wings(P,cf,a,true)+tails(P,cf,a)+legs(P,cf,col,ls.far,true);
-  if(has(P,'manybody'))for(let i=1;i<=Math.min(4,a+1);i++)s+=G('translate('+(i*8)+' '+(i%2?-10:10)*Math.ceil(i/2)/2+')',B(cf.torso,darker(col),.5,1.6));
-  if(has(P,'twoends'))s+=G('translate(244 0) scale(-1 1)',B(cf.head,P.hc||col,1)+eyes(P,cf));
-  if(cf.neck)s+=L(cf.neck,P.t==='crane'?12:16)+L(cf.neck,P.t==='crane'?7.5:11,P.hc||col);
-  s+=extraHeads(P,cf,a,col);
-  s+=B(cf.torso||cf.body,col,.88)+'<path d="'+(cf.torso||cf.body)+'" fill="url(#bp-shade)"/>';
-  if(cf.ear)s+=B(cf.ear,mix(col,INK,.1),1,2);
-  if(cf.belly)s+=Wsh(cf.belly,mix(col,GOFUN,.7),.85);
-  if(cf.fins)s+=cf.fins.map(d=>B(d,mix(col,GOFUN,.25),.8,1.8)).join('');
-  if(has(P,'fins'))s+=B('M110 100 C 122 86, 140 86, 150 96 C 138 98, 126 104, 118 110 Z',mix(col,GOFUN,.3),.85,1.6);
-  if(has(P,'hump'))s+=B('M92 72 C 96 58, 112 56, 118 70 Z',col,1,2);
-  if(has(P,'backhorns')&&a>=2)s+=[[104,64],[118,74],[132,86]].map(([x,y])=>B('M'+x+' '+(y+4)+' C '+(x+2)+' '+(y-8)+', '+(x+8)+' '+(y-14)+', '+(x+16)+' '+(y-16)+' C '+(x+12)+' '+(y-8)+', '+(x+10)+' '+y+', '+(x+8)+' '+(y+6)+' Z',GOFUN,1,1.6)).join('');
-  if(has(P,'backeyes'))s+=[[150,94],[166,98]].map(([x,y])=>'<ellipse cx="'+x+'" cy="'+y+'" rx="4" ry="2.6" fill="'+SHU+'"/>'+D(x,y,1.3)).join('');
-  if(has(P,'pearl'))s+='<circle cx="140" cy="116" r="7" fill="#f6efe0" stroke="'+GOLD+'" stroke-width="1.6"/>';
-  s+=marks(P,cf);
-  if(cf.marks&&P.t!=='crane'&&P.t!=='fowl'&&P.t!=='fish')s+=cf.marks.map(([x,y],i)=>L('M'+(x-6)+' '+(y+(i%2?14:8))+' c 5 -3, 11 -1, 15 4 M'+(x-2)+' '+(y+(i%2?20:16))+' c 4 -2, 8 0, 10 3',1,'#2b2118',.5)).join('')+
-    (cf.mane?cf.mane.map(d=>L(d,1.3,'#2b2118',.55)).join(''):'');
-  if(cf.wingNear)s+=B(cf.wingNear,P.t==='crane'?SHU:mix(col,INK,.15),P.t==='crane'?.7:.9,2)+L('M122 108 C 138 104, 156 108, 170 116',1.1,INK,.6);
-  if(cf.marks&&P.t==='crane')s+=cf.marks.map(([x,y])=>L('M'+x+' '+y+' l6 2',2.2,SHU,.9)).join('');
-  s+=legs(P,cf,col,ls.near,false);
-  if(cf.legBird)s+=ls.near.map(d=>{const e=d.split(' ').slice(-2).map(Number);return L('M'+e[0]+' '+e[1]+' l-12 3 M'+e[0]+' '+e[1]+' l1 5 M'+e[0]+' '+e[1]+' l10 3',2,has(P,'redfeet')?SHU:INK)}).join('');
-  s+=wings(P,cf,a,false);
-  if(has(P,'hands'))s+=L('M'+(cf.hcx+6)+' '+(cf.hcy+30)+' c -8 8, -16 10, -24 8',4)+L('M'+(cf.hcx-18)+' '+(cf.hcy+38)+' l-4 -4 M'+(cf.hcx-18)+' '+(cf.hcy+38)+' l-5 0 M'+(cf.hcx-18)+' '+(cf.hcy+38)+' l-3 4',1.4);
-  if(has(P,'headless')){
-    s+=L('M88 92 l-8 -4 M110 90 l8 -4',2)+'<circle cx="96" cy="104" r="3.2" fill="'+SHU+'"/>'+'<circle cx="112" cy="102" r="3.2" fill="'+SHU+'"/>'+L('M98 126 q8 4 14 0',2,SHU);
-    if(a>=2)s+=L('M64 150 L 40 70',3)+B('M30 72 C 30 60, 52 56, 54 68 C 50 74, 36 78, 30 72 Z','#8a8478',1,2)+B('M120 120 C 150 110, 160 130, 150 150 C 134 152, 120 140, 120 120 Z','#7a5a3a',.9,2);
-  }else{
-    if(cf.head&&(P.hc||cf.alwaysFace||P.hf))s+=B(cf.head,P.hc||col,1);
-    if(cf.alwaysFace)s+=B(cf.face,mix(GOFUN,col,.2),.95,1.6);
-    s+=headExtras(P,cf,a,col);
-  }
-  if(P.mn&&a>=2)s+=(cf.mane||[]).map(d=>L(d,2.2,P.mn,null,'wisp')).join('');
-  if(has(P,'thunder')&&a>=3)s+=L('M40 40 l10 14 l-8 4 l12 18',2.4,'#d9a43a')+L('M196 30 l-8 12 l8 4 l-10 16',2.4,'#d9a43a');
-  if(has(P,'fire')&&a>=4)s+=L('M150 92 c 6 -14, 16 -18, 26 -14',1.8,SHU,.85,'wisp')+L('M166 96 c 8 -12, 20 -14, 28 -8',1.8,SHU,.85,'wisp');
-  if(has(P,'flock'))s+=G('translate(150 20) scale(.38)',B(ARCH.fowl.torso,col,.9)+B(ARCH.fowl.head,P.hc||col,1)+B(ARCH.fowl.beak,'#d9a43a',1))+G('translate(170 70) scale(.32)',B(ARCH.fowl.torso,col,.9)+B(ARCH.fowl.head,P.hc||col,1)+B(ARCH.fowl.beak,'#d9a43a',1));
-  if(has(P,'pair'))s+=G('translate(30 -14) scale(.9)',B(ARCH.fowl.torso,'#b9573a',.6,1.6));
-  if(a>=4&&cf.mane)s+=cf.mane.slice(0,2).map(d=>L(d,1.6,SHU,.75,'wisp')).join('');
-  return s+(cf.lift?'</g>':'');
+const img=(id,x,y,w,h,extra)=>'<image href="'+ART+id+'.webp" x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" preserveAspectRatio="xMidYMax meet"'+(extra||'')+'/>';
+function drawArt(P){
+  const ids=artIds(P),b=ARTBOX;
+  if(ids.length<2)return img(ids[0],b.x,b.y,b.w,b.h);
+  return img(ids[1],b.x+70,b.y+8,b.w-70,b.h-8,' opacity=".6" filter="url(#bp-fog1)"')+img(ids[0],b.x,b.y+14,b.w-46,b.h-14);
 }
 
 const MOODT={happy:'',genki:'',normal:'m-normal',weak:'m-weak',dying:'m-dying'};
@@ -870,10 +631,10 @@ function petSVG(o,label){
   const P=o.hyb||spOf(o.species),mood=o.mood||'happy',asp=o.aspect?aspOf(o.aspect):null,rank=o.rank||1;
   const cls=mood==='dying'?'bob shake':(mood==='weak'?'bob slow':'bob');
   let s='<svg viewBox="0 0 240 200" class="beast '+MOODT[mood]+'" role="img" aria-label="'+esc(label||P.n)+'">';
-  if(rank>=5)s+='<circle cx="132" cy="112" r="96" fill="'+GOLD+'" fill-opacity=".16"/>';
-  if(o.stage>=MAXST&&asp)s+='<circle cx="132" cy="112" r="92" fill="url(#bp-aura-'+asp.id+')"/>';
-  if(rank>=2)s+='<circle cx="132" cy="110" r="84" fill="none" stroke="'+GOLD+'" stroke-width="2" stroke-opacity=".7" stroke-dasharray="'+(rank>=3?'1 0':'4 6')+'"/>';
-  if(rank>=4)s+='<circle cx="132" cy="110" r="76" fill="none" stroke="'+GOLD+'" stroke-width="1.2" stroke-opacity=".6"/>';
+  if(rank>=5)s+='<circle cx="128" cy="112" r="96" fill="'+GOLD+'" fill-opacity=".16"/>';
+  if(o.stage>=MAXST&&asp)s+='<circle cx="128" cy="112" r="92" fill="url(#bp-aura-'+asp.id+')"/>';
+  if(rank>=2)s+='<circle cx="128" cy="110" r="84" fill="none" stroke="'+GOLD+'" stroke-width="2" stroke-opacity=".7" stroke-dasharray="'+(rank>=3?'1 0':'4 6')+'"/>';
+  if(rank>=4)s+='<circle cx="128" cy="110" r="76" fill="none" stroke="'+GOLD+'" stroke-width="1.2" stroke-opacity=".6"/>';
   s+=L('M34 188 C 84 182, 168 182, 222 188',7,INK,.18);
   s+='<g class="'+cls+'">';
   if(o.stage===0){
@@ -884,9 +645,14 @@ function petSVG(o,label){
     if(o.grow>=0.85)s+=L('M164 128 L154 122 L148 132 L140 126',2);
     return s+'</g></svg>';
   }
-  const ks=[0,.56,.7,.85,1];
-  const k=o.stage>=MAXST?.94:ks[o.stage]+(ks[o.stage+1]-ks[o.stage])*(o.grow||0)*.7;
-  s+='<g transform="translate(132 188) scale('+k.toFixed(3)+') translate(-132 -188)">'+drawBeast(P,o.stage)+'</g></g>';
+  const ks=[0,.62,.8,.96,1];
+  const k=o.stage>=MAXST?1:ks[o.stage]+(ks[o.stage+1]-ks[o.stage])*(o.grow||0)*.7;
+  const fog=o.stage===1?' filter="url(#bp-fog2)"':o.stage===2?' filter="url(#bp-fog1)"':'';
+  s+='<g transform="translate(128 189) scale('+k.toFixed(3)+') translate(-128 -189)"><g'+fog+'>'+drawArt(P)+'</g></g>';
+  /* mist that thins as the beast grows */
+  const mist=o.stage===1?.42-.2*(o.grow||0):o.stage===2?.22-.12*(o.grow||0):0;
+  if(mist>0)s+='<rect x="0" y="0" width="240" height="200" fill="url(#bp-mist)" opacity="'+mist.toFixed(2)+'"/>';
+  s+='</g>';
   if(rank>=3)s+=spark(40,50,7,GOLD)+spark(212,40,5,GOLD)+spark(206,150,6,GOLD)+(rank>=4?spark(56,150,5,GOLD)+spark(132,22,6,GOLD):'');
   if(o.stage>=MAXST&&asp)s+='<g transform="translate(12 12)"><rect width="28" height="28" rx="3" fill="'+SHU+'"/><rect x="2.5" y="2.5" width="23" height="23" rx="2" fill="none" stroke="#fbf3e4" stroke-width="1"/><text x="14" y="20.5" text-anchor="middle" font-size="17" fill="#fbf3e4" font-family="Zen Antique, serif">'+asp.ch+'</text></g>';
   if(rank>=2)s+='<text x="228" y="22" text-anchor="end" font-size="15" fill="'+GOLD+'" font-family="Zen Antique, serif">'+'★'.repeat(rank)+'</text>';
@@ -990,7 +756,7 @@ function renderZukan(){
   if(z){const d=st.dex[z.id],a0=d.asp[0];
     detail='<section class="card"><div class="card-head"><h2>其の'+dexNo(z.id)+'　'+z.n+'</h2><button class="ghost" data-act="zsel" data-id="">閉じる</button></div>'+
       '<div class="growline">'+[1,2,3,4].map(a=>'<div><div class="zk-art">'+(a<=d.s?petSVG({species:z.id,stage:a,mood:'genki',grow:0,aspect:a===4?a0:null,rank:a===4?d.rank:1},z.n+'　'+STAGES[a]):'<svg viewBox="0 0 240 200"><text x="120" y="112" text-anchor="middle" font-size="40" fill="#9a8c70" font-family="Zen Antique, serif">？</text></svg>')+'</div><span>'+STAGES[a]+'</span></div>').join('')+'</div>'+
-      '<p style="margin:0">'+z.lore+'</p><div class="row"><span class="small muted">まとった相</span><span class="aspects">'+ASPECTS.map(a=>'<span class="asp'+(d.asp.includes(a.id)?' on':'')+'" style="'+(d.asp.includes(a.id)?'background:'+a.color:'')+'" title="'+a.name+'">'+a.ch+'</span>').join('')+'</span>'+(d.rank>1?'<span class="small muted">最高 ★'+d.rank+'</span>':'')+'</div></section>';}
+      '<p style="margin:0">'+z.lore+'</p><p class="small muted" style="margin:0">絵：清代の彩色画帖『山海經圖』より（台湾・国家図書館蔵／<a href="https://commons.wikimedia.org/wiki/File:NCL-08481_%E5%B1%B1%E6%B5%B7%E7%B6%93%E5%9C%96.pdf?page='+z.pg+'" target="_blank" rel="noopener" style="color:inherit">Wikimedia Commons</a>、パブリックドメイン）</p><div class="row"><span class="small muted">まとった相</span><span class="aspects">'+ASPECTS.map(a=>'<span class="asp'+(d.asp.includes(a.id)?' on':'')+'" style="'+(d.asp.includes(a.id)?'background:'+a.color:'')+'" title="'+a.name+'">'+a.ch+'</span>').join('')+'</span>'+(d.rank>1?'<span class="small muted">最高 ★'+d.rank+'</span>':'')+'</div></section>';}
   const cards=SPECIES.map(s=>{const d=st.dex[s.id],no=dexNo(s.id);
     if(!d||!d.s)return '<div class="zk locked"><div class="zk-art"><svg viewBox="0 0 240 200" aria-hidden="true"><text x="120" y="118" text-anchor="middle" font-size="44" fill="#b8aa8c" font-family="Zen Antique, serif">？</text></svg></div><div class="zk-name"><span class="small muted">其の'+no+'</span><b>？？？</b></div></div>';
     return '<button class="zk" data-act="zsel" data-id="'+s.id+'"><div class="zk-art">'+petSVG({species:s.id,stage:d.s,mood:'genki',grow:0,aspect:d.s>=MAXST?d.asp[0]:null,rank:d.rank||1},s.n)+'</div><div class="zk-name"><span class="small muted">其の'+no+'</span><b>'+s.n+'</b><span class="small muted">'+s.k+'</span></div><span class="aspects">'+ASPECTS.map(a=>'<span class="asp'+(d.asp.includes(a.id)?' on':'')+'" style="'+(d.asp.includes(a.id)?'background:'+a.color:'')+'">'+a.ch+'</span>').join('')+'</span></button>'}).join('');
